@@ -1,0 +1,22 @@
+-- Semillas de Plan de Cuentas Básico (Ecuador)
+INSERT INTO plan_cuentas (codigo_cuenta, nombre, tipo, acepta_movimientos) VALUES
+('1.', 'ACTIVOS', 'Activo', false),
+('1.1.', 'ACTIVOS CORRIENTES', 'Activo', false),
+('1.1.01', 'Caja', 'Activo', true),
+('1.1.02', 'Bancos - Instituciones Financieras', 'Activo', true),
+('1.1.03', 'Cuentas y Documentos por Cobrar', 'Activo', true),
+('1.2.', 'ACTIVOS NO CORRIENTES', 'Activo', false),
+('1.2.01', 'Propiedades Planta y Equipo', 'Activo', false),
+('1.2.02', 'Maquinaria y Equipo', 'Activo', true),
+('2.', 'PASIVOS', 'Pasivo', false),
+('2.1.', 'PASIVOS CORRIENTES', 'Pasivo', false),
+('2.1.01', 'Cuentas por Pagar Comerciales', 'Pasivo', true),
+('2.1.02', 'Obligaciones con el IESS / SRI', 'Pasivo', true),
+('3.', 'PATRIMONIO', 'Patrimonio', false),
+('3.1.', 'Capital Social', 'Patrimonio', true),
+('3.2.', 'Resultados Acumulados', 'Patrimonio', true),
+('4.', 'INGRESOS', 'Ingreso', false),
+('4.1.', 'Ventas de Bienes / Servicios', 'Ingreso', true),
+('5.', 'GASTOS', 'Gasto', false),
+('5.1.', 'Gastos Administrativos', 'Gasto', true),
+('5.2.', 'Gastos de Ventas', 'Gasto', true);
