@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   LayoutDashboard, 
   Users, 
@@ -10,14 +10,18 @@ import {
   PlusCircle, 
   ChevronRight,
   PieChart,
-  Grid
+  Grid,
+  LogOut
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { supabase } from './services/supabase';
+import type { Session } from '@supabase/supabase-js';
 
 // Views
 import { Entidades } from './views/Entidades';
 import { PlanCuentas } from './views/PlanCuentas';
 import { Configuracion } from './views/Configuracion';
+import { Login } from './views/Login';
 import { XMLUploadModal } from './components/XMLUploadModal';
 
 const DashboardView = ({ onUploadClick }: { onUploadClick: () => void }) => (
@@ -77,7 +81,7 @@ const DashboardView = ({ onUploadClick }: { onUploadClick: () => void }) => (
       </div>
     </div>
 
-    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', marginTop: '24px' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px', marginTop: '24px' }}>
       <div className="glass-card">
         <h3 style={{ marginBottom: '16px' }}>Últimas Transacciones</h3>
         <div className="table-placeholder" style={{ opacity: 0.7 }}>
@@ -108,8 +112,23 @@ const DashboardView = ({ onUploadClick }: { onUploadClick: () => void }) => (
 );
 
 const App = () => {
+  const [session, setSession] = useState<Session | null>(null);
   const [activeView, setActiveView] = useState('dashboard');
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const navItems = [
     { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -141,6 +160,10 @@ const App = () => {
         );
     }
   };
+
+  if (!session) {
+    return <Login />;
+  }
 
   return (
     <div className="app-container">
@@ -179,12 +202,22 @@ const App = () => {
         </nav>
 
         <div className="glass-card" style={{ padding: '16px', marginTop: 'auto', borderRadius: '12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: 32, height: 32, background: 'linear-gradient(135deg, #6366F1, #C026D3)', borderRadius: '50%' }}></div>
-            <div style={{ overflow: 'hidden' }}>
-              <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>Emanuel</div>
-              <div className="text-sec" style={{ fontSize: '0.7rem' }}>Contador Pro</div>
+          <div className="flex-between">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: 32, height: 32, background: 'linear-gradient(135deg, #6366F1, #C026D3)', borderRadius: '50%' }}></div>
+                <div style={{ overflow: 'hidden' }}>
+                    <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>{session.user.email?.split('@')[0]}</div>
+                    <div className="text-sec" style={{ fontSize: '0.7rem' }}>Contador Pro</div>
+                </div>
             </div>
+            <button 
+                onClick={() => supabase.auth.signOut()}
+                className="btn" 
+                style={{ padding: '4px', background: 'none', color: 'var(--text-sec)' }}
+                title="Cerrar Sesión"
+            >
+                <LogOut size={16} />
+            </button>
           </div>
         </div>
       </aside>
@@ -196,6 +229,27 @@ const App = () => {
           </div>
         </AnimatePresence>
       </main>
+
+      <nav className="mobile-nav">
+        {navItems.map(item => {
+          // Simplificar etiquetas para móvil si son muy largas
+          const shortLabel = item.id === 'entidades' ? 'Terceros' : 
+                            item.id === 'plan-cuentas' ? 'Contas' : 
+                            item.id === 'asientos' ? 'Asientos' : 
+                            item.id === 'reportes' ? 'Reportes' : 
+                            item.label;
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActiveView(item.id)}
+              className={`nav-item-mobile ${activeView === item.id ? 'active' : ''}`}
+            >
+              <item.icon size={22} />
+              <span>{shortLabel}</span>
+            </button>
+          );
+        })}
+      </nav>
 
       <XMLUploadModal 
         isOpen={isUploadOpen} 

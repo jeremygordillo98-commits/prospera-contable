@@ -71,58 +71,92 @@ export const Entidades = () => {
           </div>
         </div>
 
-        <div style={{ overflowX: 'auto' }}>
+        <div className="table-container">
           {loading ? (
             <div style={{ padding: '40px', textAlign: 'center' }}>
               <Loader2 className="animate-spin" size={24} style={{ margin: '0 auto', color: 'var(--primary)' }} />
             </div>
           ) : (
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ background: 'rgba(255,255,255,0.02)', textAlign: 'left' }}>
-                  <th style={thStyle}>Razón Social</th>
-                  <th style={thStyle}>RUC / Cédula</th>
-                  <th style={thStyle}>Tipo</th>
-                  <th style={thStyle}>Contacto</th>
-                  <th style={thStyle}>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
+            <>
+              {/* Tabla para Desktop */}
+              <table className="data-table desktop-table">
+                <thead>
+                  <tr>
+                    <th>Razón Social</th>
+                    <th>RUC / Cédula</th>
+                    <th>Tipo</th>
+                    <th>Contacto</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map(e => (
+                    <tr key={e.id} className="hover:bg-white/5 transition-colors">
+                      <td style={tdStyle}>
+                        <div style={{ fontWeight: 600 }}>{e.razon_social}</div>
+                      </td>
+                      <td style={tdStyle}>{e.ruc_cedula}</td>
+                      <td style={tdStyle}>
+                        <span style={{ 
+                          padding: '4px 10px', 
+                          borderRadius: '20px', 
+                          fontSize: '0.74rem', 
+                          background: getTagColor(e.tipo_entidad),
+                          color: 'white',
+                          fontWeight: 600
+                        }}>
+                          {e.tipo_entidad}
+                        </span>
+                      </td>
+                      <td style={tdStyle}>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          {e.email && <Mail size={14} className="text-sec" />}
+                          {e.telefono && <Phone size={14} className="text-sec" />}
+                          {!e.email && !e.telefono && <span className="text-sec">-</span>}
+                        </div>
+                      </td>
+                      <td style={tdStyle}>
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                          <button style={btnActionStyle}><Edit2 size={16} /></button>
+                          <button style={{ ...btnActionStyle, color: 'var(--error)' }}><Trash2 size={16} /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* Lista para Móvil */}
+              <div className="mobile-card-list">
                 {filtered.map(e => (
-                  <tr key={e.id} style={{ borderBottom: '1px solid var(--border-dark)', transition: 'background 0.2s' }} className="hover:bg-white/5">
-                    <td style={tdStyle}>
-                      <div style={{ fontWeight: 600 }}>{e.razon_social}</div>
-                    </td>
-                    <td style={tdStyle}>{e.ruc_cedula}</td>
-                    <td style={tdStyle}>
+                  <div key={e.id} className="entity-card">
+                    <div className="flex-between" style={{ marginBottom: '8px' }}>
+                      <div style={{ fontWeight: 700 }}>{e.razon_social}</div>
                       <span style={{ 
-                        padding: '4px 10px', 
+                        padding: '2px 8px', 
                         borderRadius: '20px', 
-                        fontSize: '0.75rem', 
+                        fontSize: '0.65rem', 
                         background: getTagColor(e.tipo_entidad),
-                        color: 'white',
-                        fontWeight: 600
+                        color: 'white'
                       }}>
                         {e.tipo_entidad}
                       </span>
-                    </td>
-                    <td style={tdStyle}>
-                      <div style={{ display: 'flex', gap: '8px' }}>
+                    </div>
+                    <div className="text-sec" style={{ fontSize: '0.8rem', marginBottom: '8px' }}>{e.ruc_cedula}</div>
+                    <div className="flex-between">
+                      <div className="flex gap-8">
                         {e.email && <Mail size={14} className="text-sec" />}
                         {e.telefono && <Phone size={14} className="text-sec" />}
-                        {!e.email && !e.telefono && <span className="text-sec">-</span>}
                       </div>
-                    </td>
-                    <td style={tdStyle}>
-                      <div style={{ display: 'flex', gap: '12px' }}>
+                      <div className="flex gap-8">
                         <button style={btnActionStyle}><Edit2 size={16} /></button>
                         <button style={{ ...btnActionStyle, color: 'var(--error)' }}><Trash2 size={16} /></button>
                       </div>
-                    </td>
-                  </tr>
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -130,7 +164,6 @@ export const Entidades = () => {
   );
 };
 
-const thStyle: CSSProperties = { padding: '16px', fontSize: '0.85rem', color: 'var(--text-sec)', fontWeight: 600 };
 const tdStyle: CSSProperties = { padding: '16px' };
 const btnActionStyle: CSSProperties = { background: 'none', border: 'none', color: 'var(--text-sec)', cursor: 'pointer', padding: '4px' };
 

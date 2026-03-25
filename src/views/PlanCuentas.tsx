@@ -71,58 +71,90 @@ export const PlanCuentas = () => {
           </div>
         </div>
 
-        <div style={{ overflowX: 'auto' }}>
+        <div className="table-container">
           {loading ? (
             <div style={{ padding: '40px', textAlign: 'center' }}>
               <Loader2 className="animate-spin" size={24} style={{ margin: '0 auto', color: 'var(--primary)' }} />
             </div>
           ) : (
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ background: 'rgba(255,255,255,0.02)', textAlign: 'left' }}>
-                  <th style={thStyle}>Código</th>
-                  <th style={thStyle}>Nombre de Cuenta</th>
-                  <th style={thStyle}>Tipo</th>
-                  <th style={thStyle}>Movimientos</th>
-                  <th style={thStyle}>Estadísticas</th>
-                  <th style={thStyle}>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
+            <>
+              {/* Tabla para Desktop */}
+              <table className="data-table desktop-table">
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Nombre de Cuenta</th>
+                    <th>Tipo</th>
+                    <th>Movimientos</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map(c => (
+                    <tr key={c.id} className="hover:bg-white/5 transition-colors">
+                      <td style={tdStyle}>
+                        <span style={{ fontWeight: 800, color: 'var(--primary)', letterSpacing: '0.1em' }}>{c.codigo_cuenta}</span>
+                      </td>
+                      <td style={tdStyle}>
+                        <div style={{ fontWeight: 600 }}>{c.nombre}</div>
+                      </td>
+                      <td style={tdStyle}>
+                        <span style={{ fontSize: '0.75rem', opacity: 0.8, background: 'var(--primary-light)', color: 'var(--primary)', padding: '2px 8px', borderRadius: '4px' }}>
+                          {c.tipo}
+                        </span>
+                      </td>
+                      <td style={tdStyle}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          {c.acepta_movimientos ? 
+                            <span style={{ color: 'var(--success)', fontSize: '0.75rem' }}>Si</span> : 
+                            <span style={{ opacity: 0.4, display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem' }}><Lock size={12} /> No</span>
+                          }
+                        </div>
+                      </td>
+                      <td style={tdStyle}>
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                          <button style={btnActionStyle}><Edit2 size={16} /></button>
+                          <button style={{ ...btnActionStyle, color: 'var(--error)' }}><Trash2 size={16} /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* Lista para Móvil */}
+              <div className="mobile-card-list">
                 {filtered.map(c => (
-                  <tr key={c.id} style={{ borderBottom: '1px solid var(--border-dark)', transition: 'background 0.2s' }}>
-                    <td style={tdStyle}>
-                      <span style={{ fontWeight: 800, color: 'var(--primary)', letterSpacing: '0.1em' }}>{c.codigo_cuenta}</span>
-                    </td>
-                    <td style={tdStyle}>
-                      <div style={{ fontWeight: 600 }}>{c.nombre}</div>
-                    </td>
-                    <td style={tdStyle}>
-                      <span style={{ fontSize: '0.75rem', opacity: 0.8, background: 'var(--primary-light)', color: 'var(--primary)', padding: '2px 8px', borderRadius: '4px' }}>
+                  <div key={c.id} className="entity-card">
+                    <div className="flex-between" style={{ marginBottom: '8px' }}>
+                      <div style={{ fontWeight: 800, color: 'var(--primary)' }}>{c.codigo_cuenta}</div>
+                      <span style={{ 
+                        fontSize: '0.7rem', 
+                        background: 'var(--primary-light)', 
+                        color: 'var(--primary)', 
+                        padding: '2px 6px', 
+                        borderRadius: '4px' 
+                      }}>
                         {c.tipo}
                       </span>
-                    </td>
-                    <td style={tdStyle}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    </div>
+                    <div style={{ fontWeight: 600, marginBottom: '12px' }}>{c.nombre}</div>
+                    <div className="flex-between">
+                      <div style={{ fontSize: '0.75rem' }}>
                         {c.acepta_movimientos ? 
-                          <span style={{ color: 'var(--success)', fontSize: '0.75rem' }}>Si</span> : 
-                          <span style={{ opacity: 0.4, display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem' }}><Lock size={12} /> No</span>
+                          <span style={{ color: 'var(--success)' }}>Acepta Mov.</span> : 
+                          <span style={{ opacity: 0.4 }}><Lock size={10} /> Solo Grupo</span>
                         }
                       </div>
-                    </td>
-                    <td style={tdStyle}>
-                      <div className="text-sec" style={{ fontSize: '0.75rem' }}>Ult. mov: Hace 2 días</div>
-                    </td>
-                    <td style={tdStyle}>
-                      <div style={{ display: 'flex', gap: '12px' }}>
+                      <div className="flex gap-8">
                         <button style={btnActionStyle}><Edit2 size={16} /></button>
                         <button style={{ ...btnActionStyle, color: 'var(--error)' }}><Trash2 size={16} /></button>
                       </div>
-                    </td>
-                  </tr>
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -130,6 +162,5 @@ export const PlanCuentas = () => {
   );
 };
 
-const thStyle: CSSProperties = { padding: '16px', fontSize: '0.85rem', color: 'var(--text-sec)', fontWeight: 600 };
 const tdStyle: CSSProperties = { padding: '16px' };
 const btnActionStyle: CSSProperties = { background: 'none', border: 'none', color: 'var(--text-sec)', cursor: 'pointer', padding: '4px' };
