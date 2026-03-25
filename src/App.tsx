@@ -17,17 +17,25 @@ import { motion, AnimatePresence } from 'framer-motion';
 // Views
 import { Entidades } from './views/Entidades';
 import { PlanCuentas } from './views/PlanCuentas';
+import { Configuracion } from './views/Configuracion';
 import { XMLUploadModal } from './components/XMLUploadModal';
 
 const DashboardView = ({ onUploadClick }: { onUploadClick: () => void }) => (
-  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="dashboard-content">
+  <motion.div 
+    initial={{ opacity: 0, y: 20 }} 
+    animate={{ opacity: 1, y: 0 }} 
+    exit={{ opacity: 0, y: -20 }}
+    className="dashboard-content"
+  >
     <header className="flex-between">
       <div>
         <h1 className="h1">Prospera Contable</h1>
         <p className="text-sec">Tu gestión financiera automatizada para Pymes.</p>
       </div>
       <div className="flex gap-8">
-        <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><PlusCircle size={18} /> Nuevo Asiento</button>
+        <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <PlusCircle size={18} /> Nuevo Asiento
+        </button>
         <button 
           onClick={onUploadClick} 
           className="btn glass-card" 
@@ -45,7 +53,9 @@ const DashboardView = ({ onUploadClick }: { onUploadClick: () => void }) => (
           <TrendingUp size={20} className="text-success" />
         </div>
         <div style={{ fontSize: '2rem', fontWeight: 800, margin: '12px 0' }}>$45,230.15</div>
-        <div className="text-sec" style={{ fontSize: '0.8rem' }}><span className="text-success">+12%</span> vs mes anterior</div>
+        <div className="text-sec" style={{ fontSize: '0.8rem' }}>
+          <span className="text-success">+12%</span> vs mes anterior
+        </div>
       </div>
       
       <div className="glass-card">
@@ -72,7 +82,7 @@ const DashboardView = ({ onUploadClick }: { onUploadClick: () => void }) => (
         <h3 style={{ marginBottom: '16px' }}>Últimas Transacciones</h3>
         <div className="table-placeholder" style={{ opacity: 0.7 }}>
           {[1,2,3,4,5].map(i => (
-            <div key={i} className="flex-between" style={{ padding: '12px 0', borderBottom: '1px solid var(--border-dark)' }}>
+            <div key={i} className="flex-between" style={{ padding: '12px 0', borderBottom: '1px solid var(--border-color)' }}>
               <div>
                 <div style={{ fontWeight: 600 }}>Compra de Mercadería - XML 123...{i}</div>
                 <div className="text-sec" style={{ fontSize: '0.75rem' }}>24 Mar, 2026 • Distribuidora Continental</div>
@@ -115,12 +125,19 @@ const App = () => {
       case 'dashboard': return <DashboardView onUploadClick={() => setIsUploadOpen(true)} />;
       case 'entidades': return <Entidades />;
       case 'plan-cuentas': return <PlanCuentas />;
+      case 'config': return <Configuracion />;
       default:
         return (
-          <div className="glass-card" style={{ textAlign: 'center', padding: '100px 0' }}>
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }} 
+            animate={{ opacity: 1, scale: 1 }} 
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="glass-card" 
+            style={{ textAlign: 'center', padding: '100px 0' }}
+          >
             <h2 className="h1">Módulo en Construcción</h2>
             <p className="text-sec">Próxima entrega: {navItems.find(n => n.id === activeView)?.label}</p>
-          </div>
+          </motion.div>
         );
     }
   };
@@ -151,7 +168,7 @@ const App = () => {
                 color: activeView === item.id ? 'var(--primary)' : 'var(--text-sec)',
                 padding: '12px 16px',
                 marginBottom: '4px',
-                border: activeView === item.id ? '1px solid rgba(79, 70, 229, 0.2)' : 'none',
+                border: activeView === item.id ? '1px solid rgba(99, 102, 241, 0.2)' : 'none',
               }}
             >
               <item.icon size={20} />
@@ -163,7 +180,7 @@ const App = () => {
 
         <div className="glass-card" style={{ padding: '16px', marginTop: 'auto', borderRadius: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: 32, height: 32, background: 'linear-gradient(135deg, #4f46e5, #8b5cf6)', borderRadius: '50%' }}></div>
+            <div style={{ width: 32, height: 32, background: 'linear-gradient(135deg, #6366F1, #C026D3)', borderRadius: '50%' }}></div>
             <div style={{ overflow: 'hidden' }}>
               <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>Emanuel</div>
               <div className="text-sec" style={{ fontSize: '0.7rem' }}>Contador Pro</div>
@@ -174,7 +191,9 @@ const App = () => {
 
       <main className="main-content">
         <AnimatePresence mode="wait">
-          {renderContent()}
+          <div key={activeView}>
+            {renderContent()}
+          </div>
         </AnimatePresence>
       </main>
 
@@ -183,7 +202,6 @@ const App = () => {
         onClose={() => setIsUploadOpen(false)} 
         onSuccess={() => {
            console.log("Upload Success!");
-           // Aquí se podrían recargar los datos
         }} 
       />
     </div>
