@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { 
-  BookOpen, 
   Plus, 
   Search, 
-  ArrowRight,
   Loader2,
   Trash2,
   Edit2,

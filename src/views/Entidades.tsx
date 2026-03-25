@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { 
-  Users, 
   Search, 
   Plus, 
   Mail, 
   Phone, 
-  FileText,
   Loader2,
   Trash2,
   Edit2
