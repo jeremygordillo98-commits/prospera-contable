@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import type { CSSProperties } from 'react';
 import { supabase } from '../services/supabase';
 import { 
   Search, 
@@ -129,9 +130,9 @@ export const Entidades = () => {
   );
 };
 
-const thStyle: React.CSSProperties = { padding: '16px', fontSize: '0.85rem', color: 'var(--text-sec)', fontWeight: 600 };
-const tdStyle: React.CSSProperties = { padding: '16px' };
-const btnActionStyle: React.CSSProperties = { background: 'none', border: 'none', color: 'var(--text-sec)', cursor: 'pointer', padding: '4px' };
+const thStyle: CSSProperties = { padding: '16px', fontSize: '0.85rem', color: 'var(--text-sec)', fontWeight: 600 };
+const tdStyle: CSSProperties = { padding: '16px' };
+const btnActionStyle: CSSProperties = { background: 'none', border: 'none', color: 'var(--text-sec)', cursor: 'pointer', padding: '4px' };
 
 const getTagColor = (tipo: string) => {
   switch (tipo) {
