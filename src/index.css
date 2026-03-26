@@ -1,1 +1,79 @@
-:root { --primary: #6366F1; --primary-hover: #4F46E5; --primary-light: rgba(99, 102, 241, 0.15); --bg-color: #0b1120; --card-bg: rgba(30, 41, 59, 0.7); --nav-bg: rgba(11, 17, 32, 0.85); --border-color: rgba(255, 255, 255, 0.1); --text-main: #F8FAFC; --text-sec: #94A3B8; --success: #10B981; --error: #EF4444; --warning: #F59E0B; --glass: blur(12px) saturate(180%); --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.3); --font-family: sans-serif; --transition: all 0.3s ease; } body { background: var(--bg-color); color: var(--text-main); font-family: var(--font-family); margin: 0; } .app-container { display: flex; height: 100vh; } .sidebar { width: 260px; background: var(--nav-bg); border-right: 1px solid var(--border-color); } .main-content { flex: 1; padding: 20px; } .glass-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; } .btn { padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; border: none; } .btn-primary { background: var(--primary); color: white; } .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; z-index: 9999; } .modal-content { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; min-width: 400px; }
+:root {
+  --primary: #6366F1;
+  --primary-hover: #4F46E5;
+  --primary-light: rgba(99, 102, 241, 0.15);
+  --bg-color: #0b1120;
+  --card-bg: rgba(30, 41, 59, 0.7);
+  --nav-bg: rgba(11, 17, 32, 0.85);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --text-main: #F8FAFC;
+  --text-sec: #94A3B8;
+  --success: #10B981;
+  --error: #EF4444;
+  --warning: #F59E0B;
+  --glass: blur(12px) saturate(180%);
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  --font-family: sans-serif;
+  --transition: all 0.3s ease;
+}
+
+body {
+  background: var(--bg-color);
+  color: var(--text-main);
+  font-family: var(--font-family);
+  margin: 0;
+}
+
+.app-container {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 260px;
+  background: var(--nav-bg);
+  border-right: 1px solid var(--border-color);
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
+}
+
+.glass-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  border: none;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal-content {
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  min-width: 400px;
+}

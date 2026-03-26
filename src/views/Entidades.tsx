@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export const Entidades = () => {
+export const Entidades = ({ empresaId }: { empresaId: string }) => {
   const [entidades, setEntidades] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -31,10 +31,12 @@ export const Entidades = () => {
   const [saving, setSaving] = useState(false);
 
   const fetchEntidades = async () => {
+    if (!empresaId) return;
     setLoading(true);
     const { data, error } = await supabase
       .from('entidades')
       .select('*')
+      .eq('id_empresa', empresaId)
       .order('razon_social', { ascending: true });
     
     if (!error && data) setEntidades(data);
@@ -43,7 +45,7 @@ export const Entidades = () => {
 
   useEffect(() => {
     fetchEntidades();
-  }, []);
+  }, [empresaId]);
 
   const filtered = entidades.filter(e => 
     e.razon_social.toLowerCase().includes(search.toLowerCase()) || 
@@ -81,7 +83,7 @@ export const Entidades = () => {
         const { error } = await supabase.from('entidades').update(formData).eq('id', editingId);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from('entidades').insert([formData]);
+        const { error } = await supabase.from('entidades').insert([{ ...formData, id_empresa: empresaId }]);
         if (error) throw error;
       }
       await fetchEntidades();

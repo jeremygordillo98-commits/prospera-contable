@@ -1,28 +1,48 @@
 import { useState } from 'react';
 import { supabase } from '../services/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, Loader2, ArrowRight } from 'lucide-react';
+import { Mail, Lock, Loader2, UserPlus, LogIn } from 'lucide-react';
 
 export const Login = () => {
+    const [isRegistering, setIsRegistering] = useState(false);
     const [loading, setLoading] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [showMagicLinkSent, setShowMagicLinkSent] = useState(false);
+    const [message, setMessage] = useState<string | null>(null);
 
-    const handleLogin = async (e: React.FormEvent) => {
+    const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
+        setMessage(null);
 
-        const { error } = await supabase.auth.signInWithPassword({
-            email,
-            password
-        });
+        if (isRegistering) {
+            const { error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    emailRedirectTo: window.location.origin
+                }
+            });
+            if (error) {
+                setError(error.message);
+                setLoading(false);
+            } else {
+                setMessage("¡Registro iniciado! Revisa tu correo para confirmar tu cuenta.");
+                setLoading(false);
+            }
+        } else {
+            const { error } = await supabase.auth.signInWithPassword({
+                email,
+                password
+            });
 
-        if (error) {
-            setError(error.message);
-            setLoading(false);
+            if (error) {
+                setError(error.message);
+                setLoading(false);
+            }
         }
     };
 
@@ -64,8 +84,8 @@ export const Login = () => {
             >
                 <div style={{ textAlign: 'center', marginBottom: '32px' }}>
                     <div style={{ width: 48, height: 48, background: 'var(--primary)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '1.5rem', margin: '0 auto 16px' }}>P</div>
-                    <h1 className="h1" style={{ fontSize: '1.75rem', marginBottom: '8px' }}>Prospera Pymes</h1>
-                    <p className="text-sec">Panel de Contabilidad Avanzada</p>
+                    <h1 className="h1" style={{ fontSize: '1.75rem', marginBottom: '8px' }}>Prospera Contable</h1>
+                    <p className="text-sec">{isRegistering ? 'Crea tu cuenta profesional' : 'Panel de Contabilidad Avanzada'}</p>
                 </div>
 
                 <AnimatePresence mode="wait">
@@ -84,12 +104,22 @@ export const Login = () => {
                             <p className="text-sec">Hemos enviado un acceso directo a <b>{email}</b>. Revisa tu bandeja de entrada o spam.</p>
                             <button className="btn" style={{ marginTop: '12px' }} onClick={() => setShowMagicLinkSent(false)}>Volver</button>
                         </motion.div>
+                    ) : message ? (
+                        <motion.div 
+                            key="message"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            style={{ textAlign: 'center', padding: '20px 0' }}
+                        >
+                            <div style={{ color: 'var(--success)', marginBottom: '16px', fontWeight: 600 }}>{message}</div>
+                            <button className="btn" onClick={() => { setMessage(null); setIsRegistering(false); }}>Ir al Login</button>
+                        </motion.div>
                     ) : (
                         <motion.form 
                             key="login-form"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            onSubmit={handleLogin} 
+                            onSubmit={handleAuth} 
                             style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
                         >
                             <div className="input-group">
@@ -133,7 +163,9 @@ export const Login = () => {
                             )}
 
                             <button className="btn btn-primary" type="submit" disabled={loading} style={{ padding: '14px', width: '100%', justifyContent: 'center' }}>
-                                {loading ? <Loader2 size={18} className="animate-spin" /> : <>Ingresar <ArrowRight size={18} /></>}
+                                {loading ? <Loader2 size={18} className="animate-spin" /> : (
+                                    isRegistering ? <><UserPlus size={18} /> Registrarme</> : <><LogIn size={18} /> Ingresar</>
+                                )}
                             </button>
 
                             <div style={{ position: 'relative', textAlign: 'center', margin: '16px 0' }}>
@@ -155,7 +187,13 @@ export const Login = () => {
                 </AnimatePresence>
 
                 <div style={{ marginTop: '32px', textAlign: 'center', fontSize: '0.85rem' }}>
-                    <span className="text-sec">¿No tienes cuenta?</span> <a href="#" style={{ color: 'var(--primary)', fontWeight: 700, textDecoration: 'none' }}>Solicitar Acceso al Administrador</a>
+                    <span className="text-sec">{isRegistering ? '¿Ya tienes cuenta?' : '¿No tienes cuenta?'}</span> 
+                    <button 
+                        onClick={() => setIsRegistering(!isRegistering)}
+                        style={{ background: 'none', border: 'none', color: 'var(--primary)', fontWeight: 700, cursor: 'pointer', marginLeft: '8px' }}
+                    >
+                        {isRegistering ? 'Iniciar Sesión' : 'Registrarme'}
+                    </button>
                 </div>
             </motion.div>
         </div>

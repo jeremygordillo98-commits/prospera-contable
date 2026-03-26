@@ -17,11 +17,12 @@ import { CATALOGO_RETENCIONES_RENTA } from '../utils/sriCatalog';
 
 interface XMLUploadModalProps {
   isOpen: boolean;
+  empresaId: string;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-export const XMLUploadModal: React.FC<XMLUploadModalProps> = ({ isOpen, onClose, onSuccess }) => {
+export const XMLUploadModal: React.FC<XMLUploadModalProps> = ({ isOpen, empresaId, onClose, onSuccess }) => {
   const [file, setFile] = useState<File | null>(null);
   const [parsing, setParsing] = useState(false);
   const [parsedData, setParsedData] = useState<SRIInvoiceData | null>(null);
@@ -60,15 +61,16 @@ export const XMLUploadModal: React.FC<XMLUploadModalProps> = ({ isOpen, onClose,
   };
 
   const handleSave = async () => {
-    if (!parsedData) return;
+    if (!parsedData || !empresaId) return;
     setSaving(true);
 
     try {
-      // 1. Verificar o crear la entidad (Proveedor)
+      // 1. Verificar o crear la entidad (Proveedor) vinculada a esta empresa
       let { data: entidad, error: eError } = await supabase
         .from('entidades')
         .select('id')
         .eq('ruc_cedula', parsedData.rucEmisor)
+        .eq('id_empresa', empresaId)
         .single();
       
       if (eError || !entidad) {
@@ -77,7 +79,8 @@ export const XMLUploadModal: React.FC<XMLUploadModalProps> = ({ isOpen, onClose,
           .insert({
             ruc_cedula: parsedData.rucEmisor,
             razon_social: parsedData.razonSocialEmisor,
-            tipo_entidad: 'Proveedor'
+            tipo_entidad: 'Proveedor',
+            id_empresa: empresaId
           })
           .select()
           .single();
@@ -86,7 +89,7 @@ export const XMLUploadModal: React.FC<XMLUploadModalProps> = ({ isOpen, onClose,
         entidad = newEntidad;
       }
 
-      // 2. Crear la transacción cabecera
+      // 2. Crear la transacción cabecera vinculada a esta empresa
       const { data: transaccion, error: tError } = await supabase
         .from('transacciones')
         .insert({
@@ -95,7 +98,8 @@ export const XMLUploadModal: React.FC<XMLUploadModalProps> = ({ isOpen, onClose,
           tipo_comprobante: 'Factura',
           numero_comprobante: parsedData.numeroComprobante,
           id_entidad: entidad?.id,
-          xml_referencia: parsedData.claveAcceso
+          xml_referencia: parsedData.claveAcceso,
+          id_empresa: empresaId
         })
         .select()
         .single();

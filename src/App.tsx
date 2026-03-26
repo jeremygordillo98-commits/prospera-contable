@@ -12,7 +12,9 @@ import {
   PieChart,
   Grid,
   LogOut,
-  Loader2
+  Loader2,
+  Building2,
+  Plus
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from './services/supabase';
@@ -25,7 +27,13 @@ import { Configuracion } from './views/Configuracion';
 import { Login } from './views/Login';
 import { XMLUploadModal } from './components/XMLUploadModal';
 
-const DashboardView = ({ onUploadClick }: { onUploadClick: () => void }) => {
+interface Empresa {
+  id: string;
+  nombre_empresa: string;
+  ruc_empresa: string;
+}
+
+const DashboardView = ({ empresaId, onUploadClick }: { empresaId: string, onUploadClick: () => void }) => {
   const [stats, setStats] = useState({
     balance: 0,
     cxc: 0,
@@ -38,7 +46,10 @@ const DashboardView = ({ onUploadClick }: { onUploadClick: () => void }) => {
 
   useEffect(() => {
     const fetchDashboardData = async () => {
-      // Intentar obtener transacciones
+      if (!empresaId) return;
+      setStats(prev => ({ ...prev, loading: true }));
+
+      // Intentar obtener transacciones filtradas por empresa
       const { data: txs } = await supabase
         .from('transacciones')
         .select(`
@@ -46,6 +57,7 @@ const DashboardView = ({ onUploadClick }: { onUploadClick: () => void }) => {
           entidades(razon_social),
           movimientos(debe, haber)
         `)
+        .eq('id_empresa', empresaId)
         .order('fecha', { ascending: false })
         .limit(5);
         
@@ -53,19 +65,18 @@ const DashboardView = ({ onUploadClick }: { onUploadClick: () => void }) => {
         setTransacciones(txs);
       }
       
-      // Intentar obtener movimientos de cuentas clave si es posible, o usar mocks dinámicos si la db está vacía
       setStats({
         balance: txs && txs.length > 0 ? 45230.15 : 0, 
         cxc: txs && txs.length > 0 ? 12840.00 : 0, 
         cxp: txs && txs.length > 0 ? 5120.40 : 0,
-        cxcCount: 8,
-        cxpCount: 3,
+        cxcCount: txs?.length || 0,
+        cxpCount: 0,
         loading: false
       });
     };
     
     fetchDashboardData();
-  }, []);
+  }, [empresaId]);
 
   return (
     <motion.div 
@@ -76,10 +87,10 @@ const DashboardView = ({ onUploadClick }: { onUploadClick: () => void }) => {
     >
       <header className="flex-between">
         <div>
-          <h1 className="h1">Prospera Contable</h1>
-          <p className="text-sec">Tu gestión financiera automatizada para Pymes.</p>
+          <h1 className="h1">Panel de Control</h1>
+          <p className="text-sec">Gestión financiera para esta cuenta.</p>
         </div>
-        <div className="flex gap-8">
+        <div className="flex gap-4">
           <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => alert("Módulo de asientos en construcción")}>
             <PlusCircle size={18} /> Nuevo Asiento
           </button>
@@ -126,7 +137,7 @@ const DashboardView = ({ onUploadClick }: { onUploadClick: () => void }) => {
                 <Users size={20} style={{ color: '#EF4444' }} />
               </div>
               <div style={{ fontSize: '2rem', fontWeight: 800, margin: '12px 0' }}>${stats.cxp.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-              <div className="text-sec" style={{ fontSize: '0.8rem' }}>Revisar vencimientos</div>
+              <div className="text-sec" style={{ fontSize: '0.8rem' }}>Consultar XML cargados</div>
             </div>
           </div>
 
@@ -178,6 +189,13 @@ const App = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [activeView, setActiveView] = useState('dashboard');
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+  
+  // Multitenancy states
+  const [empresas, setEmpresas] = useState<Empresa[]>([]);
+  const [selectedEmpresa, setSelectedEmpresa] = useState<Empresa | null>(null);
+  const [loadingEmpresas, setLoadingEmpresas] = useState(true);
+  const [showNewEmpresaModal, setShowNewEmpresaModal] = useState(false);
+  const [newEmpresaName, setNewEmpresaName] = useState('');
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -193,6 +211,50 @@ const App = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (session) {
+      fetchEmpresas();
+    }
+  }, [session]);
+
+  const fetchEmpresas = async () => {
+    setLoadingEmpresas(true);
+    const { data, error } = await supabase
+      .from('empresas_gestionadas')
+      .select('*')
+      .order('nombre_empresa');
+    
+    if (!error && data) {
+      setEmpresas(data);
+      if (data.length > 0 && !selectedEmpresa) {
+        setSelectedEmpresa(data[0]);
+      }
+    }
+    setLoadingEmpresas(false);
+  };
+
+  const createEmpresa = async () => {
+    if (!newEmpresaName) return;
+    const { data, error } = await supabase
+      .from('empresas_gestionadas')
+      .insert({ 
+        nombre_empresa: newEmpresaName,
+        ruc_empresa: `TEMP-${Date.now()}` // RUC temporal si solo queremos nombre
+      })
+      .select()
+      .single();
+    
+    if (!error && data) {
+      setEmpresas([...empresas, data]);
+      setSelectedEmpresa(data);
+      setShowNewEmpresaModal(false);
+      setNewEmpresaName('');
+    } else {
+      console.error(error);
+      alert("Error al crear la empresa");
+    }
+  };
+
   const navItems = [
     { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { id: 'entidades', icon: Users, label: 'Terceros (CXC/CXP)' },
@@ -203,10 +265,32 @@ const App = () => {
   ];
 
   const renderContent = () => {
+    if (!selectedEmpresa) {
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60vh', textAlign: 'center' }}>
+                <Building2 size={64} className="text-sec" style={{ marginBottom: '24px', opacity: 0.3 }} />
+                <h2 className="h1">Crea tu primera empresa</h2>
+                <p className="text-sec" style={{ maxWidth: '400px', margin: '16px 0 24px' }}>
+                    Para comenzar a llevar la contabilidad, necesitas registrar al menos un cliente o empresa.
+                </p>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                    <input 
+                        type="text" 
+                        placeholder="Nombre de la empresa" 
+                        value={newEmpresaName}
+                        onChange={(e) => setNewEmpresaName(e.target.value)}
+                        style={{ padding: '12px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', color: 'white' }}
+                    />
+                    <button className="btn btn-primary" onClick={createEmpresa}>Crear Cliente</button>
+                </div>
+            </div>
+        );
+    }
+
     switch (activeView) {
-      case 'dashboard': return <DashboardView onUploadClick={() => setIsUploadOpen(true)} />;
-      case 'entidades': return <Entidades />;
-      case 'plan-cuentas': return <PlanCuentas />;
+      case 'dashboard': return <DashboardView empresaId={selectedEmpresa.id} onUploadClick={() => setIsUploadOpen(true)} />;
+      case 'entidades': return <Entidades empresaId={selectedEmpresa.id} />;
+      case 'plan-cuentas': return <PlanCuentas empresaId={selectedEmpresa.id} />;
       case 'config': return <Configuracion />;
       default:
         return (
@@ -228,6 +312,14 @@ const App = () => {
     return <Login />;
   }
 
+  if (loadingEmpresas) {
+      return (
+          <div className="flex-center" style={{ height: '100vh', background: '#0f172a' }}>
+              <Loader2 className="animate-spin text-primary" size={48} />
+          </div>
+      );
+  }
+
   return (
     <div className="app-container">
       <div className="aurora-bg">
@@ -236,9 +328,31 @@ const App = () => {
       </div>
 
       <aside className="sidebar">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '40px', paddingLeft: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '32px', paddingLeft: '8px' }}>
           <div style={{ width: 32, height: 32, background: 'var(--primary)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800 }}>P</div>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.5px' }}>Prospera <span style={{ color: 'var(--primary)' }}>Pymes</span></h2>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.5px' }}>Prospera <span style={{ color: 'var(--primary)' }}>Contable</span></h2>
+        </div>
+
+        {/* SELECTOR DE EMPRESA */}
+        <div style={{ marginBottom: '24px', padding: '0 8px' }}>
+            <label style={{ fontSize: '0.7rem', color: 'var(--text-sec)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px', display: 'block' }}>Cliente Seleccionado</label>
+            <div className="glass-card" style={{ padding: '4px', border: '1px solid var(--border-color)', borderRadius: '12px' }}>
+                <select 
+                    value={selectedEmpresa?.id || ''} 
+                    onChange={(e) => setSelectedEmpresa(empresas.find(emp => emp.id === e.target.value) || null)}
+                    style={{ width: '100%', background: 'transparent', border: 'none', color: 'white', padding: '8px', fontSize: '0.9rem', outline: 'none' }}
+                >
+                    {empresas.map(emp => (
+                        <option key={emp.id} value={emp.id} style={{ background: '#1c243a' }}>{emp.nombre_empresa}</option>
+                    ))}
+                </select>
+                <button 
+                  onClick={() => setShowNewEmpresaModal(true)}
+                  style={{ width: '100%', padding: '8px', background: 'rgba(255,255,255,0.03)', border: 'none', borderRadius: '8px', color: 'var(--primary)', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
+                >
+                    <Plus size={14} /> Nuevo Cliente
+                </button>
+            </div>
         </div>
 
         <nav style={{ flex: 1 }}>
@@ -313,8 +427,38 @@ const App = () => {
         })}
       </nav>
 
+      {/* Modal Nueva Empresa */}
+      <AnimatePresence>
+        {showNewEmpresaModal && (
+          <div className="modal-overlay" style={{ zIndex: 200 }}>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }} 
+              animate={{ opacity: 1, scale: 1 }} 
+              className="glass-card" 
+              style={{ width: '90%', maxWidth: '400px', padding: '32px' }}
+            >
+                <h3>Nuevo Cliente Contable</h3>
+                <p className="text-sec" style={{ margin: '12px 0 24px' }}>Ingresa el nombre de la empresa para separar su contabilidad.</p>
+                <input 
+                    autoFocus
+                    type="text" 
+                    placeholder="Nombre de la empresa" 
+                    value={newEmpresaName}
+                    onChange={(e) => setNewEmpresaName(e.target.value)}
+                    style={{ width: '100%', padding: '12px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', color: 'white', marginBottom: '24px' }}
+                />
+                <div style={{ display: 'flex', gap: '12px' }}>
+                    <button className="btn flex-1" onClick={() => setShowNewEmpresaModal(false)}>Cancelar</button>
+                    <button className="btn btn-primary flex-1" onClick={createEmpresa}>Crear Empresa</button>
+                </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       <XMLUploadModal 
         isOpen={isUploadOpen} 
+        empresaId={selectedEmpresa?.id || ''}
         onClose={() => setIsUploadOpen(false)} 
         onSuccess={() => {
            console.log("Upload Success!");

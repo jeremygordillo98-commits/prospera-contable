@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export const PlanCuentas = () => {
+export const PlanCuentas = ({ empresaId }: { empresaId: string }) => {
   const [cuentas, setCuentas] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -29,10 +29,12 @@ export const PlanCuentas = () => {
   const [saving, setSaving] = useState(false);
 
   const fetchCuentas = async () => {
+    if (!empresaId) return;
     setLoading(true);
     const { data, error } = await supabase
       .from('plan_cuentas')
       .select('*')
+      .eq('id_empresa', empresaId)
       .order('codigo_cuenta', { ascending: true });
     
     if (!error && data) setCuentas(data);
@@ -41,7 +43,7 @@ export const PlanCuentas = () => {
 
   useEffect(() => {
     fetchCuentas();
-  }, []);
+  }, [empresaId]);
 
   const filtered = cuentas.filter(c => 
     c.nombre.toLowerCase().includes(search.toLowerCase()) || 
@@ -78,7 +80,7 @@ export const PlanCuentas = () => {
         const { error } = await supabase.from('plan_cuentas').update(formData).eq('id', editingId);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from('plan_cuentas').insert([formData]);
+        const { error } = await supabase.from('plan_cuentas').insert([{ ...formData, id_empresa: empresaId }]);
         if (error) throw error;
       }
       await fetchCuentas();
