@@ -9,7 +9,6 @@ export const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
-    const [showMagicLinkSent, setShowMagicLinkSent] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
 
     const handleAuth = async (e: React.FormEvent) => {
@@ -46,29 +45,6 @@ export const Login = () => {
         }
     };
 
-    const handleMagicLink = async () => {
-        if (!email) {
-            setError("Por favor, ingresa tu correo primero.");
-            return;
-        }
-        setLoading(true);
-        setError(null);
-
-        const { error } = await supabase.auth.signInWithOtp({
-            email,
-            options: {
-                emailRedirectTo: window.location.origin
-            }
-        });
-
-        if (error) {
-            setError(error.message);
-        } else {
-            setShowMagicLinkSent(true);
-        }
-        setLoading(false);
-    };
-
     return (
         <div className="flex-center" style={{ minHeight: '100vh', padding: '20px' }}>
             <div className="aurora-bg">
@@ -89,22 +65,7 @@ export const Login = () => {
                 </div>
 
                 <AnimatePresence mode="wait">
-                    {showMagicLinkSent ? (
-                        <motion.div 
-                            key="magic-link-sent"
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="flex-center" 
-                            style={{ flexDirection: 'column', textAlign: 'center', gap: '16px', padding: '20px 0' }}
-                        >
-                            <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--primary-light)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <Mail size={32} />
-                            </div>
-                            <h3>¡Revisa tu correo!</h3>
-                            <p className="text-sec">Hemos enviado un acceso directo a <b>{email}</b>. Revisa tu bandeja de entrada o spam.</p>
-                            <button className="btn" style={{ marginTop: '12px' }} onClick={() => setShowMagicLinkSent(false)}>Volver</button>
-                        </motion.div>
-                    ) : message ? (
+                    {message ? (
                         <motion.div 
                             key="message"
                             initial={{ opacity: 0, scale: 0.9 }}
@@ -123,9 +84,9 @@ export const Login = () => {
                             style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
                         >
                             <div className="input-group">
-                                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '8px', color: 'var(--text-sec)' }}>Correo Electrónico</label>
+                                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '6px', color: 'var(--text-sec)' }}>Correo Electrónico</label>
                                 <div style={{ position: 'relative' }}>
-                                    <Mail size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-sec)' }} />
+                                    <Mail size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-sec)' }} />
                                     <input 
                                         type="email" 
                                         placeholder="hola@empresa.com" 
