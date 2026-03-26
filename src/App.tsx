@@ -425,6 +425,14 @@ const App = () => {
             </button>
           );
         })}
+        <button
+          onClick={() => supabase.auth.signOut()}
+          className="nav-item-mobile"
+          style={{ color: 'var(--error)' }}
+        >
+          <LogOut size={22} />
+          <span>Salir</span>
+        </button>
       </nav>
 
       {/* Modal Nueva Empresa */}

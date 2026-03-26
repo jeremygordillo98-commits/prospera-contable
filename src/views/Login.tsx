@@ -132,22 +132,22 @@ export const Login = () => {
                                         required 
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        style={{ width: '100%', padding: '12px 12px 12px 42px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', borderRadius: '10px', color: 'white', outline: 'none' }}
+                                        style={{ width: '100%', padding: '10px 10px 10px 38px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', borderRadius: '10px', color: 'white', outline: 'none', fontSize: '0.85rem' }}
                                     />
                                 </div>
                             </div>
 
                             <div className="input-group">
-                                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '8px', color: 'var(--text-sec)' }}>Contraseña</label>
+                                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '6px', color: 'var(--text-sec)' }}>Contraseña</label>
                                 <div style={{ position: 'relative' }}>
-                                    <Lock size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-sec)' }} />
+                                    <Lock size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-sec)' }} />
                                     <input 
                                         type="password" 
                                         placeholder="••••••••" 
                                         required 
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        style={{ width: '100%', padding: '12px 12px 12px 42px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', borderRadius: '10px', color: 'white', outline: 'none' }}
+                                        style={{ width: '100%', padding: '10px 10px 10px 38px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', borderRadius: '10px', color: 'white', outline: 'none', fontSize: '0.85rem' }}
                                     />
                                 </div>
                             </div>
