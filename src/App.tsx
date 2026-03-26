@@ -99,7 +99,7 @@ const App = () => {
   };
 
   const createEmpresa = async () => {
-    if (!newEmpresaName) return;
+    if (!newEmpresaName || !session?.user?.id) return;
 
     // VALIDACIÓN DE LÍMITE
     if (empresas.length >= limiteEmpresas) {
@@ -112,7 +112,9 @@ const App = () => {
       .from('empresas_gestionadas')
       .insert({ 
         nombre_empresa: newEmpresaName,
-        ruc_empresa: `TEMP-${Date.now()}` // RUC temporal si solo queremos nombre
+        ruc_empresa: `TEMP-${Date.now()}`, // RUC temporal si solo queremos nombre
+        id_usuario: session.user.id,
+        moneda: 'USD'
       })
       .select()
       .single();
@@ -123,8 +125,8 @@ const App = () => {
       setShowNewEmpresaModal(false);
       setNewEmpresaName('');
     } else {
-      console.error(error);
-      alert("Error al crear la empresa");
+      console.error("Supabase Error:", error);
+      alert(`Error al crear la empresa: ${error?.message || 'Error desconocido'}`);
     }
   };
 
