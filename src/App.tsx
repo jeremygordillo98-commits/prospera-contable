@@ -129,7 +129,7 @@ const App = () => {
                         placeholder="Nombre de la empresa" 
                         value={newEmpresaName}
                         onChange={(e) => setNewEmpresaName(e.target.value)}
-                        style={{ padding: '12px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', color: 'white' }}
+                        style={{ padding: '12px', borderRadius: '10px', background: 'var(--input-bg)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}
                     />
                     <button className="btn btn-primary" onClick={createEmpresa}>Crear Cliente</button>
                 </div>
@@ -182,7 +182,7 @@ const App = () => {
 
       <aside className="sidebar">
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '32px', paddingLeft: '8px' }}>
-          <div style={{ width: 32, height: 32, background: 'var(--primary)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800 }}>P</div>
+          <div style={{ width: 32, height: 32, background: 'var(--primary)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800 }}>P</div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.5px' }}>Prospera <span style={{ color: 'var(--primary)' }}>Contable</span></h2>
         </div>
 
@@ -193,10 +193,10 @@ const App = () => {
                 <select 
                     value={selectedEmpresa?.id || ''} 
                     onChange={(e) => setSelectedEmpresa(empresas.find(emp => emp.id === e.target.value) || null)}
-                    style={{ width: '100%', background: 'transparent', border: 'none', color: 'white', padding: '8px', fontSize: '0.9rem', outline: 'none' }}
+                    style={{ width: '100%', background: 'transparent', border: 'none', color: 'var(--text-main)', padding: '8px', fontSize: '0.9rem', outline: 'none' }}
                 >
                     {empresas.map(emp => (
-                        <option key={emp.id} value={emp.id} style={{ background: '#1c243a' }}>{emp.nombre_empresa}</option>
+                        <option key={emp.id} value={emp.id} style={{ background: 'var(--bg-color)' }}>{emp.nombre_empresa}</option>
                     ))}
                 </select>
                 <button 
@@ -309,7 +309,7 @@ const App = () => {
                     placeholder="Nombre de la empresa" 
                     value={newEmpresaName}
                     onChange={(e) => setNewEmpresaName(e.target.value)}
-                    style={{ width: '100%', padding: '12px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', color: 'white', marginBottom: '24px' }}
+                    style={{ width: '100%', padding: '12px', borderRadius: '10px', background: 'var(--input-bg)', border: '1px solid var(--border-color)', color: 'var(--text-main)', marginBottom: '24px' }}
                 />
                 <div style={{ display: 'flex', gap: '12px' }}>
                     <button className="btn flex-1" onClick={() => setShowNewEmpresaModal(false)}>Cancelar</button>

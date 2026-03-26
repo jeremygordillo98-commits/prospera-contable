@@ -22,6 +22,10 @@ export const Login = () => {
         const mode = params.get('mode');
         if (mode === 'register') setView('register');
         else if (mode === 'forgot') setView('forgot');
+
+        // Forzar tema oscuro al cargar Login
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.body.className = 'dark-theme';
     }, []);
 
     const handleAuth = async (e: React.FormEvent) => {
@@ -61,8 +65,8 @@ export const Login = () => {
     };
 
     return (
-        <div className="flex-center" style={{ minHeight: '100vh', padding: '20px' }}>
-            <div className="aurora-bg">
+        <div className="flex-center" style={{ minHeight: '100vh', padding: '20px', background: '#0b1120' }} data-theme="dark">
+            <div className="aurora-bg" style={{ background: '#0b1120' }}>
                 <div className="orb orb-1"></div>
                 <div className="orb orb-2"></div>
             </div>

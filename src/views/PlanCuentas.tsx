@@ -296,10 +296,10 @@ const btnActionStyle: CSSProperties = { background: 'none', border: 'none', colo
 const inputStyle: CSSProperties = {
   width: '100%',
   padding: '10px 14px',
-  background: 'rgba(255,255,255,0.05)',
+  background: 'var(--input-bg)',
   border: '1px solid var(--border-color)',
   borderRadius: '8px',
-  color: 'white',
+  color: 'var(--text-main)',
   outline: 'none',
   fontSize: '0.9rem',
   fontFamily: 'inherit'
