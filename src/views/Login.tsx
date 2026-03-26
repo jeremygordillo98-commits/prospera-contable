@@ -162,25 +162,10 @@ export const Login = () => {
                                 </motion.div>
                             )}
 
-                            <button className="btn btn-primary" type="submit" disabled={loading} style={{ padding: '14px', width: '100%', justifyContent: 'center' }}>
+                            <button className="btn btn-primary" type="submit" disabled={loading} style={{ padding: '14px', width: '100%', justifyContent: 'center', marginTop: '10px', boxShadow: '0 8px 16px rgba(99, 102, 241, 0.2)' }}>
                                 {loading ? <Loader2 size={18} className="animate-spin" /> : (
                                     isRegistering ? <><UserPlus size={18} /> Registrarme</> : <><LogIn size={18} /> Ingresar</>
                                 )}
-                            </button>
-
-                            <div style={{ position: 'relative', textAlign: 'center', margin: '16px 0' }}>
-                                <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)' }} />
-                                <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: '#1c243a', padding: '0 12px', fontSize: '0.75rem', color: 'var(--text-sec)' }}>O también</span>
-                            </div>
-
-                            <button 
-                                type="button" 
-                                className="btn glass-card" 
-                                onClick={handleMagicLink}
-                                disabled={loading}
-                                style={{ width: '100%', justifyContent: 'center' }}
-                            >
-                                Recibir Acceso Directo (Email)
                             </button>
                         </motion.form>
                     )}
