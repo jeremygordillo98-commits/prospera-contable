@@ -21,7 +21,11 @@ import { Entidades } from './views/Entidades';
 import { PlanCuentas } from './views/PlanCuentas';
 import { Configuracion } from './views/Configuracion';
 import { Login } from './views/Login';
+import { Asientos } from './views/Asientos';
+import { Reportes } from './views/Reportes';
+import { Perfil } from './views/Perfil';
 import { XMLUploadModal } from './components/XMLUploadModal';
+import { DashboardView } from './views/Dashboard';
 
 interface Empresa {
   id: string;
@@ -29,7 +33,7 @@ interface Empresa {
   ruc_empresa: string;
 }
 
-import { DashboardView } from './views/Dashboard';
+
 
 const App = () => {
   const [session, setSession] = useState<Session | null>(null);
@@ -137,18 +141,21 @@ const App = () => {
       case 'dashboard': return <DashboardView empresaId={selectedEmpresa.id} onUploadClick={() => setIsUploadOpen(true)} />;
       case 'entidades': return <Entidades empresaId={selectedEmpresa.id} />;
       case 'plan-cuentas': return <PlanCuentas empresaId={selectedEmpresa.id} />;
+      case 'asientos': return <Asientos />;
+      case 'reportes': return <Reportes />;
       case 'config': return <Configuracion />;
+      case 'perfil': return <Perfil />;
       default:
         return (
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }} 
             animate={{ opacity: 1, scale: 1 }} 
             exit={{ opacity: 0, scale: 0.95 }}
-            className="glass-card" 
-            style={{ textAlign: 'center', padding: '100px 0' }}
+            className="flex-center flex-col glass-card" 
+            style={{ textAlign: 'center', padding: '100px 0', marginTop: '40px' }}
           >
             <h2 className="h1">Módulo en Construcción</h2>
-            <p className="text-sec">Próxima entrega: {navItems.find(n => n.id === activeView)?.label}</p>
+            <p className="text-sec">Próxima entrega: {activeView}</p>
           </motion.div>
         );
     }
@@ -226,17 +233,20 @@ const App = () => {
 
         <div className="glass-card" style={{ padding: '16px', marginTop: 'auto', borderRadius: '12px' }}>
           <div className="flex-between">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ width: 32, height: 32, background: 'linear-gradient(135deg, #6366F1, #C026D3)', borderRadius: '50%' }}></div>
+            <button
+                onClick={() => setActiveView('perfil')}
+                style={{ background: 'transparent', border: 'none', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', textAlign: 'left', flex: 1 }}
+            >
+                <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), #C026D3)', display: 'flex', alignItems: 'center', justifyItems: 'center', color: '#fff', fontWeight: 800 }}></div>
                 <div style={{ overflow: 'hidden' }}>
-                    <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>{session.user.email?.split('@')[0]}</div>
-                    <div className="text-sec" style={{ fontSize: '0.7rem' }}>Contador Pro</div>
+                    <div style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-main)', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100px' }}>{session.user.user_metadata?.nombre_completo || session.user.email?.split('@')[0]}</div>
+                    <div className="text-sec" style={{ fontSize: '0.7rem' }}>Mi Perfil</div>
                 </div>
-            </div>
+            </button>
             <button 
                 onClick={() => supabase.auth.signOut()}
-                className="btn glass-card flex-center" 
-                style={{ width: '36px', height: '36px', padding: 0, borderRadius: '10px', color: '#EF4444', border: '1px solid rgba(239, 68, 68, 0.2)' }}
+                className="btn flex-center" 
+                style={{ width: '36px', height: '36px', padding: 0, borderRadius: '10px', color: 'var(--error)', border: '1px solid rgba(239, 68, 68, 0.2)', background: 'transparent' }}
                 title="Cerrar Sesión"
             >
                 <LogOut size={18} />

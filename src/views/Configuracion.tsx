@@ -2,11 +2,7 @@ import { useTheme } from '../context/ThemeContext';
 import { 
   Sun, 
   Moon, 
-  Settings, 
-  Shield, 
-  Database,
   Layout,
-  ChevronRight
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -25,57 +21,27 @@ export const Configuracion = () => {
           <Layout size={20} className="text-primary" /> Apariencia
         </h3>
         
-        <div className="flex-between p-4 bg-white/5 rounded-xl border border-white/10">
+        <div className="flex-between p-4 bg-black/5 dark:bg-white/5 rounded-xl border border-black/10 dark:border-white/10">
           <div>
             <div style={{ fontWeight: 600 }}>Esquema de Color</div>
             <div className="text-sec">Cambia entre modo claro y oscuro.</div>
           </div>
           
-          <div className="flex bg-black/20 p-1 rounded-full border border-white/10">
+          <div className="flex bg-black/5 dark:bg-black/20 p-1 rounded-full border border-black/10 dark:border-white/10">
             <button 
               onClick={() => !isDark || toggleTheme()}
-              className={`btn ${!isDark ? 'btn-primary' : 'hover:bg-white/5'}`}
-              style={{ borderRadius: '50px', padding: '8px 20px', background: !isDark ? 'var(--primary)' : 'transparent' }}
+              className={`btn ${!isDark ? 'btn-primary' : 'hover:bg-black/5 dark:hover:bg-white/5'}`}
+              style={{ borderRadius: '50px', padding: '8px 20px', background: !isDark ? 'var(--primary)' : 'transparent', color: !isDark ? '#fff' : 'var(--text-main)' }}
             >
               <Sun size={20} />
             </button>
             <button 
               onClick={() => isDark || toggleTheme()}
-              className={`btn ${isDark ? 'btn-primary' : 'hover:bg-white/5'}`}
-              style={{ borderRadius: '50px', padding: '8px 20px', background: isDark ? 'var(--primary)' : 'transparent' }}
+              className={`btn ${isDark ? 'btn-primary' : 'hover:bg-black/5 dark:hover:bg-white/5'}`}
+              style={{ borderRadius: '50px', padding: '8px 20px', background: isDark ? 'var(--primary)' : 'transparent', color: isDark ? '#fff' : 'var(--text-main)' }}
             >
               <Moon size={20} />
             </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="glass-card">
-        <h3 className="flex items-center gap-2 mb-6" style={{ fontSize: '1.2rem' }}>
-          <Shield size={20} className="text-primary" /> Seguridad y Datos
-        </h3>
-        
-        <div className="space-y-4">
-          <div className="flex-between p-4 hover:bg-white/5 rounded-xl transition-all cursor-pointer">
-            <div className="flex items-center gap-4">
-              <Database className="text-sec" size={20} />
-              <div>
-                <div style={{ fontWeight: 600 }}>Conexión Supabase</div>
-                <div className="text-sec">Estado: <span className="text-success">Conectado (Mock)</span></div>
-              </div>
-            </div>
-            <ChevronRight className="text-sec" size={20} />
-          </div>
-          
-          <div className="flex-between p-4 hover:bg-white/5 rounded-xl transition-all cursor-pointer">
-            <div className="flex items-center gap-4">
-              <Settings className="text-sec" size={20} />
-              <div>
-                <div style={{ fontWeight: 600 }}>Parámetros ATS</div>
-                <div className="text-sec">Configura rangos de fechas y secuencias.</div>
-              </div>
-            </div>
-            <ChevronRight className="text-sec" size={20} />
           </div>
         </div>
       </div>
