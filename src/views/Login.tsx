@@ -1,47 +1,62 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, Loader2, UserPlus, LogIn } from 'lucide-react';
+import { Mail, Lock, Loader2, UserPlus, LogIn, Eye, EyeOff, User, ArrowLeft } from 'lucide-react';
 
 export const Login = () => {
-    const [isRegistering, setIsRegistering] = useState(false);
+    const [view, setView] = useState<'login' | 'register' | 'forgot'>('login');
     const [loading, setLoading] = useState(false);
+    
+    // Form fields
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState<string | null>(null);
-    const [message, setMessage] = useState<string | null>(null);
+    const [confirmPassword, setConfirmPassword] = useState('');
+    
+    // UI states
+    const [showPassword, setShowPassword] = useState(false);
+    const [message, setMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const mode = params.get('mode');
+        if (mode === 'register') setView('register');
+        else if (mode === 'forgot') setView('forgot');
+    }, []);
 
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setError(null);
         setMessage(null);
 
-        if (isRegistering) {
-            const { error } = await supabase.auth.signUp({
-                email,
-                password,
-                options: {
-                    emailRedirectTo: window.location.origin
-                }
-            });
-            if (error) {
-                setError(error.message);
-                setLoading(false);
-            } else {
-                setMessage("¡Registro iniciado! Revisa tu correo para confirmar tu cuenta.");
-                setLoading(false);
+        try {
+            if (view === 'register') {
+                if (password !== confirmPassword) throw new Error('Las contraseñas no coinciden.');
+                if (password.length < 6) throw new Error('La contraseña debe tener al menos 6 caracteres.');
+                const { error } = await supabase.auth.signUp({ 
+                    email, 
+                    password, 
+                    options: { 
+                        data: { nombre_completo: name },
+                        emailRedirectTo: window.location.origin 
+                    } 
+                });
+                if (error) throw error;
+                setMessage({ type: 'success', text: '¡Cuenta creada! Revisa tu correo electrónico para confirmar.' });
+            } else if (view === 'login') {
+                const { error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+            } else if (view === 'forgot') {
+                const { error } = await supabase.auth.resetPasswordForEmail(email, { 
+                    redirectTo: `${window.location.origin}/update-password` 
+                });
+                if (error) throw error;
+                setMessage({ type: 'success', text: 'Instrucciones enviadas a tu correo electrónico.' });
             }
-        } else {
-            const { error } = await supabase.auth.signInWithPassword({
-                email,
-                password
-            });
-
-            if (error) {
-                setError(error.message);
-                setLoading(false);
-            }
+        } catch (error: any) {
+            setMessage({ type: 'error', text: error.message });
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -56,33 +71,54 @@ export const Login = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="glass-card" 
-                style={{ width: '100%', maxWidth: '420px', padding: '40px' }}
+                style={{ width: '100%', maxWidth: '420px', padding: '40px', position: 'relative', zIndex: 1 }}
             >
                 <div style={{ textAlign: 'center', marginBottom: '32px' }}>
                     <div style={{ width: 48, height: 48, background: 'var(--primary)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '1.5rem', margin: '0 auto 16px' }}>P</div>
-                    <h1 className="h1" style={{ fontSize: '1.75rem', marginBottom: '8px' }}>Prospera Contable</h1>
-                    <p className="text-sec">{isRegistering ? 'Crea tu cuenta profesional' : 'Panel de Contabilidad Avanzada'}</p>
+                    <h1 className="h1" style={{ fontSize: '1.75rem', marginBottom: '8px' }}>
+                        {view === 'login' ? 'Prospera Contable' : view === 'register' ? 'Crea tu cuenta' : 'Recuperar clave'}
+                    </h1>
+                    <p className="text-sec">
+                        {view === 'login' ? 'Panel de Contabilidad Avanzada' : view === 'register' ? 'Inicia tu despacho inteligente' : 'Te ayudaremos a entrar de nuevo'}
+                    </p>
                 </div>
 
                 <AnimatePresence mode="wait">
-                    {message ? (
+                    {message && message.type === 'success' && view !== 'login' ? (
                         <motion.div 
                             key="message"
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             style={{ textAlign: 'center', padding: '20px 0' }}
                         >
-                            <div style={{ color: 'var(--success)', marginBottom: '16px', fontWeight: 600 }}>{message}</div>
-                            <button className="btn" onClick={() => { setMessage(null); setIsRegistering(false); }}>Ir al Login</button>
+                            <div style={{ color: 'var(--success)', marginBottom: '16px', fontWeight: 600 }}>{message.text}</div>
+                            <button className="btn" onClick={() => { setMessage(null); setView('login'); }}>Ir al Login</button>
                         </motion.div>
                     ) : (
                         <motion.form 
-                            key="login-form"
+                            key={`form-${view}`}
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             onSubmit={handleAuth} 
                             style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
                         >
+                            {view === 'register' && (
+                                <div className="input-group">
+                                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '6px', color: 'var(--text-sec)' }}>Nombre Completo</label>
+                                    <div style={{ position: 'relative' }}>
+                                        <User size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-sec)' }} />
+                                        <input 
+                                            type="text" 
+                                            placeholder="Juan Pérez" 
+                                            required 
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
+                                            style={{ width: '100%', padding: '10px 10px 10px 38px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', borderRadius: '10px', color: 'white', outline: 'none', fontSize: '0.85rem' }}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="input-group">
                                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '6px', color: 'var(--text-sec)' }}>Correo Electrónico</label>
                                 <div style={{ position: 'relative' }}>
@@ -98,48 +134,89 @@ export const Login = () => {
                                 </div>
                             </div>
 
-                            <div className="input-group">
-                                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '6px', color: 'var(--text-sec)' }}>Contraseña</label>
-                                <div style={{ position: 'relative' }}>
-                                    <Lock size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-sec)' }} />
-                                    <input 
-                                        type="password" 
-                                        placeholder="••••••••" 
-                                        required 
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        style={{ width: '100%', padding: '10px 10px 10px 38px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', borderRadius: '10px', color: 'white', outline: 'none', fontSize: '0.85rem' }}
-                                    />
+                            {view !== 'forgot' && (
+                                <div className="input-group">
+                                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '6px', color: 'var(--text-sec)' }}>Contraseña</label>
+                                    <div style={{ position: 'relative' }}>
+                                        <Lock size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-sec)' }} />
+                                        <input 
+                                            type={showPassword ? "text" : "password"} 
+                                            placeholder="••••••••" 
+                                            required 
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            style={{ width: '100%', padding: '10px 38px 10px 38px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', borderRadius: '10px', color: 'white', outline: 'none', fontSize: '0.85rem' }}
+                                        />
+                                        <button 
+                                            type="button" 
+                                            onClick={() => setShowPassword(!showPassword)} 
+                                            style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-sec)', cursor: 'pointer', padding: 0 }}
+                                        >
+                                            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
 
-                            {error && (
+                            {view === 'register' && (
+                                <div className="input-group">
+                                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '6px', color: 'var(--text-sec)' }}>Confirmar Contraseña</label>
+                                    <div style={{ position: 'relative' }}>
+                                        <Lock size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-sec)' }} />
+                                        <input 
+                                            type={showPassword ? "text" : "password"} 
+                                            placeholder="••••••••" 
+                                            required 
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            style={{ width: '100%', padding: '10px 10px 10px 38px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', borderRadius: '10px', color: 'white', outline: 'none', fontSize: '0.85rem' }}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            {message && message.type === 'error' && (
                                 <motion.div 
                                     initial={{ height: 0, opacity: 0 }}
                                     animate={{ height: 'auto', opacity: 1 }}
-                                    style={{ color: 'var(--error)', fontSize: '0.8rem', textAlign: 'center' }}
+                                    style={{ color: 'var(--error)', fontSize: '0.8rem', textAlign: 'center', fontWeight: 600 }}
                                 >
-                                    {error}
+                                    {message.text}
                                 </motion.div>
                             )}
 
-                            <button className="btn btn-primary" type="submit" disabled={loading} style={{ padding: '14px', width: '100%', justifyContent: 'center', marginTop: '10px', boxShadow: '0 8px 16px rgba(99, 102, 241, 0.2)' }}>
+                            <button className="btn btn-primary" type="submit" disabled={loading} style={{ padding: '14px', width: '100%', justifyContent: 'center', margin: '10px 0', boxShadow: '0 8px 16px rgba(99, 102, 241, 0.2)' }}>
                                 {loading ? <Loader2 size={18} className="animate-spin" /> : (
-                                    isRegistering ? <><UserPlus size={18} /> Registrarme</> : <><LogIn size={18} /> Ingresar</>
+                                    view === 'login' ? <><LogIn size={18} /> Ingresar</> : 
+                                    view === 'register' ? <><UserPlus size={18} /> Registrarme</> :
+                                    <><Mail size={18} /> Enviar Instrucciones</>
                                 )}
                             </button>
                         </motion.form>
                     )}
                 </AnimatePresence>
 
-                <div style={{ marginTop: '32px', textAlign: 'center', fontSize: '0.85rem' }}>
-                    <span className="text-sec">{isRegistering ? '¿Ya tienes cuenta?' : '¿No tienes cuenta?'}</span> 
-                    <button 
-                        onClick={() => setIsRegistering(!isRegistering)}
-                        style={{ background: 'none', border: 'none', color: 'var(--primary)', fontWeight: 700, cursor: 'pointer', marginLeft: '8px' }}
-                    >
-                        {isRegistering ? 'Iniciar Sesión' : 'Registrarme'}
-                    </button>
+                <div style={{ marginTop: '20px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                    {view === 'login' ? (
+                        <>
+                            <button onClick={() => setView('forgot')} style={{ background: 'none', border: 'none', color: 'var(--text-sec)', fontSize: '0.85rem', cursor: 'pointer' }}>
+                                ¿Olvidaste tu contraseña?
+                            </button>
+                            <div style={{ color: 'var(--text-sec)', fontSize: '0.9rem' }}>
+                                ¿No tienes cuenta? 
+                                <button onClick={() => setView('register')} style={{ background: 'none', border: 'none', color: 'var(--primary)', fontWeight: 800, cursor: 'pointer', marginLeft: '6px' }}>Regístrate gratis</button>
+                            </div>
+                        </>
+                    ) : view === 'register' ? (
+                        <div style={{ color: 'var(--text-sec)', fontSize: '0.9rem' }}>
+                            ¿Ya tienes cuenta? 
+                            <button onClick={() => setView('login')} style={{ background: 'none', border: 'none', color: 'var(--primary)', fontWeight: 800, cursor: 'pointer', marginLeft: '6px' }}>Inicia sesión</button>
+                        </div>
+                    ) : (
+                        <button onClick={() => setView('login')} style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: '0.9rem', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                            <ArrowLeft size={16} /> Volver a login
+                        </button>
+                    )}
                 </div>
             </motion.div>
         </div>
