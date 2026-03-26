@@ -389,11 +389,11 @@ const App = () => {
             </div>
             <button 
                 onClick={() => supabase.auth.signOut()}
-                className="btn" 
-                style={{ padding: '4px', background: 'none', color: 'var(--text-sec)' }}
+                className="btn glass-card flex-center" 
+                style={{ width: '36px', height: '36px', padding: 0, borderRadius: '10px', color: '#EF4444', border: '1px solid rgba(239, 68, 68, 0.2)' }}
                 title="Cerrar Sesión"
             >
-                <LogOut size={16} />
+                <LogOut size={18} />
             </button>
           </div>
         </div>
