@@ -46,6 +46,8 @@ const App = () => {
   const [loadingEmpresas, setLoadingEmpresas] = useState(true);
   const [showNewEmpresaModal, setShowNewEmpresaModal] = useState(false);
   const [newEmpresaName, setNewEmpresaName] = useState('');
+  const [limiteEmpresas, setLimiteEmpresas] = useState<number>(2); // Default fallback
+  const [showLimitModal, setShowLimitModal] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -64,8 +66,21 @@ const App = () => {
   useEffect(() => {
     if (session) {
       fetchEmpresas();
+      fetchLimite();
     }
   }, [session]);
+
+  const fetchLimite = async () => {
+    const { data, error } = await supabase
+      .from('perfiles')
+      .select('limite_empresas')
+      .eq('id', session?.user.id)
+      .single();
+    
+    if (!error && data) {
+      setLimiteEmpresas(data.limite_empresas || 2);
+    }
+  };
 
   const fetchEmpresas = async () => {
     setLoadingEmpresas(true);
@@ -85,6 +100,14 @@ const App = () => {
 
   const createEmpresa = async () => {
     if (!newEmpresaName) return;
+
+    // VALIDACIÓN DE LÍMITE
+    if (empresas.length >= limiteEmpresas) {
+        setShowNewEmpresaModal(false);
+        setShowLimitModal(true);
+        return;
+    }
+
     const { data, error } = await supabase
       .from('empresas_gestionadas')
       .insert({ 
@@ -315,6 +338,36 @@ const App = () => {
                     <button className="btn flex-1" onClick={() => setShowNewEmpresaModal(false)}>Cancelar</button>
                     <button className="btn btn-primary flex-1" onClick={createEmpresa}>Crear Empresa</button>
                 </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Modal Límite Alcanzado */}
+      <AnimatePresence>
+        {showLimitModal && (
+          <div className="modal-overlay" style={{ zIndex: 300 }}>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              className="glass-card" 
+              style={{ width: '90%', maxWidth: '450px', padding: '40px', textAlign: 'center' }}
+            >
+                <div style={{ width: 64, height: 64, background: 'rgba(239, 68, 68, 0.1)', color: 'var(--error)', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+                    <Building2 size={32} />
+                </div>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '16px' }}>Límite de Clientes Alcanzado</h3>
+                <p className="text-sec" style={{ marginBottom: '32px', lineHeight: '1.6' }}>
+                    Tu plan actual permite gestionar hasta <strong>{limiteEmpresas} empresas</strong>. 
+                    Para ampliar tu capacidad y gestionar más clientes, por favor contáctanos.
+                </p>
+                
+                <div className="glass-card" style={{ padding: '20px', background: 'rgba(99, 102, 241, 0.05)', marginBottom: '24px', border: '1px dashed var(--primary)' }}>
+                    <div style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--primary)', fontWeight: 700, marginBottom: '8px' }}>Soporte Comercial</div>
+                    <div style={{ fontWeight: 600, fontSize: '1rem' }}>prospera.app.soporte@gmail.com</div>
+                </div>
+
+                <button className="btn btn-primary w-full" onClick={() => setShowLimitModal(false)}>Entendido</button>
             </motion.div>
           </div>
         )}
