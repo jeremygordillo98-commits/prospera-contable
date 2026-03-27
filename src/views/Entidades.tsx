@@ -334,12 +334,3 @@ const inputStyle: CSSProperties = {
   outline: 'none',
   fontSize: '0.9rem'
 };
-
-const getTagColor = (tipo: string) => {
-  switch (tipo) {
-    case 'Cliente': return 'rgba(16, 185, 129, 0.4)';
-    case 'Proveedor': return 'rgba(79, 70, 229, 0.4)';
-    case 'Empleado': return 'rgba(245, 158, 11, 0.4)';
-    default: return 'rgba(148, 163, 184, 0.4)';
-  }
-};
