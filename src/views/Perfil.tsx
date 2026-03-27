@@ -10,6 +10,7 @@ export const Perfil = () => {
     const [userData, setUserData] = useState({
         nombre_completo: '',
         email: '',
+        ruc_profesional: '',
     });
     const [message, setMessage] = useState({ text: '', type: '' });
 
@@ -20,9 +21,17 @@ export const Perfil = () => {
     const loadProfile = async () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
+            // Intentar cargar desde la tabla perfiles primero
+            const { data: dbProfile } = await supabase
+                .from('perfiles')
+                .select('*')
+                .eq('id', user.id)
+                .single();
+
             setUserData({
-                nombre_completo: user.user_metadata?.nombre_completo || '',
+                nombre_completo: dbProfile?.nombre_completo || user.user_metadata?.nombre_completo || '',
                 email: user.email || '',
+                ruc_profesional: dbProfile?.ruc_profesional || '',
             });
         }
     };
@@ -33,19 +42,23 @@ export const Perfil = () => {
         setMessage({ text: '', type: '' });
 
         try {
-            const { error } = await supabase.auth.updateUser({
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error('No hay sesión activa');
+
+            // 1. Actualizar metadata de Auth
+            const { error: authError } = await supabase.auth.updateUser({
                 data: { nombre_completo: userData.nombre_completo }
             });
-
-            if (error) throw error;
+            if (authError) throw authError;
             
-            // También deberíamos actualizar la tabla perfiles si existe
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                await supabase.from('perfiles').update({
-                    nombre_completo: userData.nombre_completo
-                }).eq('id', user.id);
-            }
+            // 2. Actualizar o Insertar en tabla perfiles (upsert)
+            const { error: dbError } = await supabase.from('perfiles').upsert({
+                id: user.id,
+                nombre_completo: userData.nombre_completo,
+                email: userData.email,
+                ruc_profesional: userData.ruc_profesional
+            });
+            if (dbError) throw dbError;
 
             setMessage({ text: 'Perfil actualizado exitosamente', type: 'success' });
         } catch (error: any) {
@@ -108,6 +121,19 @@ export const Perfil = () => {
                             style={inputStyle}
                             placeholder="Ej: Ruiz & Asociados"
                             required
+                        />
+                    </div>
+
+                    <div>
+                        <label style={{ fontWeight: 600, fontSize: '0.9rem' }} className="flex items-center gap-2">
+                             RUC Profesional o Firma
+                        </label>
+                        <input
+                            type="text"
+                            value={userData.ruc_profesional}
+                            onChange={e => setUserData({ ...userData, ruc_profesional: e.target.value })}
+                            style={inputStyle}
+                            placeholder="Ej: 1712345678001"
                         />
                     </div>
 
