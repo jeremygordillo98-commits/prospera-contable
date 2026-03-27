@@ -83,13 +83,13 @@ export const DashboardView: React.FC<DashboardProps> = ({ empresaId, onUploadCli
                     <p className="text-sec" style={{ fontSize: '1.1rem', marginTop: '4px' }}>Gestión financiera inteligente para tu negocio</p>
                 </div>
                 <div className="flex gap-4" style={{ display: 'flex', gap: '12px' }}>
-                    <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px', borderRadius: '14px', boxShadow: '0 10px 20px -5px rgba(99, 102, 241, 0.4)' }} onClick={() => alert("Módulo de asientos en construcción")}>
+                    <button className="btn btn-primary" onClick={() => alert("Módulo de asientos en construcción")}>
                         <PlusCircle size={20} /> <span className="hide-mobile">Nuevo Asiento</span>
                     </button>
                     <button
                         onClick={onUploadClick}
                         className="btn glass-card"
-                        style={{ padding: '12px 20px', display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid var(--border-color)', borderRadius: '14px' }}
+                        style={{ border: '1px solid var(--border-color)' }}
                     >
                         <Upload size={20} /> <span className="hide-mobile">Cargar XML</span>
                     </button>

@@ -120,9 +120,9 @@ export const PlanCuentas = ({ empresaId }: { empresaId: string }) => {
       </header>
 
       <div className="glass-card" style={{ padding: '0' }}>
-        <div style={{ padding: '20px', borderBottom: '1px solid var(--border-dark)', display: 'flex', gap: '12px' }}>
+        <div style={{ padding: '20px', borderBottom: '1px solid var(--border-color)', display: 'flex', gap: '12px' }}>
           <div style={{ position: 'relative', flex: 1 }}>
-            <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-sec)' }} />
+            <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-sec)', opacity: 0.6 }} />
             <input 
               type="text" 
               placeholder="Buscar por código o nombre..." 
@@ -246,40 +246,42 @@ export const PlanCuentas = ({ empresaId }: { empresaId: string }) => {
                 <button onClick={handleCloseModal} style={btnActionStyle}><X size={20} /></button>
               </div>
 
-              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', color: 'var(--text-sec)' }}>Código de Cuenta*</label>
-                  <input required placeholder="Ej. 1.1.01" value={formData.codigo_cuenta} onChange={e => setFormData({...formData, codigo_cuenta: e.target.value})} style={inputStyle} />
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '16px' }}>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-sec)' }}>Código de Cuenta*</label>
+                    <input required placeholder="Ej. 1.1.01" value={formData.codigo_cuenta} onChange={e => setFormData({...formData, codigo_cuenta: e.target.value})} style={inputStyle} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-sec)' }}>Tipo de Cuenta*</label>
+                    <select required value={formData.tipo} onChange={e => setFormData({...formData, tipo: e.target.value})} style={inputStyle}>
+                        <option value="Activo">Activo</option>
+                        <option value="Pasivo">Pasivo</option>
+                        <option value="Patrimonio">Patrimonio</option>
+                        <option value="Ingreso">Ingreso</option>
+                        <option value="Gasto">Gasto</option>
+                    </select>
+                  </div>
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', color: 'var(--text-sec)' }}>Nombre de Cuenta*</label>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-sec)' }}>Nombre de Cuenta*</label>
                   <input required placeholder="Ej. Caja General" value={formData.nombre} onChange={e => setFormData({...formData, nombre: e.target.value})} style={inputStyle} />
                 </div>
-                <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', color: 'var(--text-sec)' }}>Tipo de Cuenta*</label>
-                  <select required value={formData.tipo} onChange={e => setFormData({...formData, tipo: e.target.value})} style={inputStyle}>
-                    <option value="Activo">Activo</option>
-                    <option value="Pasivo">Pasivo</option>
-                    <option value="Patrimonio">Patrimonio</option>
-                    <option value="Ingreso">Ingreso</option>
-                    <option value="Gasto">Gasto</option>
-                  </select>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', background: 'var(--primary-light)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
                   <input 
                     type="checkbox" 
                     id="acepta_movimientos"
                     checked={formData.acepta_movimientos} 
                     onChange={e => setFormData({...formData, acepta_movimientos: e.target.checked})}
-                    style={{ width: '18px', height: '18px', accentColor: 'var(--primary)' }}
+                    style={{ width: '20px', height: '20px', accentColor: 'var(--primary)', cursor: 'pointer' }}
                   />
-                  <label htmlFor="acepta_movimientos" style={{ fontSize: '0.9rem' }}>Acepta Movimientos (Subcuenta)</label>
+                  <label htmlFor="acepta_movimientos" style={{ fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer' }}>Acepta Movimientos (Subcuenta)</label>
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '16px' }}>
-                  <button type="button" onClick={handleCloseModal} className="btn glass-card" style={{ padding: '8px 16px' }}>Cancelar</button>
-                  <button type="submit" disabled={saving} className="btn btn-primary" style={{ padding: '8px 16px' }}>
-                    {saving ? <Loader2 className="animate-spin" size={16} /> : 'Guardar'}
+                  <button type="button" onClick={handleCloseModal} className="btn glass-card" style={{ padding: '10px 20px', border: '1px solid var(--border-color)' }}>Cancelar</button>
+                  <button type="submit" disabled={saving} className="btn btn-primary" style={{ padding: '10px 24px' }}>
+                    {saving ? <Loader2 className="animate-spin" size={18} /> : 'Guardar Cuenta'}
                   </button>
                 </div>
               </form>
