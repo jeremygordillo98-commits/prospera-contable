@@ -10,7 +10,9 @@ import {
   LogOut,
   Loader2,
   Building2,
-  Plus
+  Plus,
+  MoreHorizontal,
+  User
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from './services/supabase';
@@ -39,6 +41,7 @@ const App = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [activeView, setActiveView] = useState('dashboard');
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   
   // Multitenancy states
   const [empresas, setEmpresas] = useState<Empresa[]>([]);
@@ -289,32 +292,69 @@ const App = () => {
       </main>
 
       <nav className="mobile-nav">
-        {navItems.map(item => {
-          const shortLabel = item.id === 'entidades' ? 'Terceros' : 
-                            item.id === 'plan-cuentas' ? 'Cuentas' : 
-                            item.id === 'asientos' ? 'Asientos' : 
-                            item.id === 'reportes' ? 'Reportes' : 
-                            item.label;
-          return (
-            <button
-              key={item.id}
-              onClick={() => setActiveView(item.id)}
-              className={`nav-item-mobile ${activeView === item.id ? 'active' : ''}`}
-            >
-              <item.icon size={22} />
-              <span>{shortLabel}</span>
-            </button>
-          );
-        })}
+        {[
+          { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+          { id: 'entidades', icon: Users, label: 'Terceros' },
+          { id: 'asientos', icon: Grid, label: 'Asientos' },
+        ].map(item => (
+          <button
+            key={item.id}
+            onClick={() => {
+              setActiveView(item.id);
+              setIsMoreMenuOpen(false);
+            }}
+            className={`nav-item-mobile ${activeView === item.id && !isMoreMenuOpen ? 'active' : ''}`}
+          >
+            <item.icon size={24} />
+            <span>{item.label}</span>
+          </button>
+        ))}
         <button
-          onClick={() => supabase.auth.signOut()}
-          className="nav-item-mobile"
-          style={{ color: 'var(--error)' }}
+          onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}
+          className={`nav-item-mobile ${isMoreMenuOpen ? 'active' : ''}`}
         >
-          <LogOut size={22} />
-          <span>Salir</span>
+          <MoreHorizontal size={24} />
+          <span>Más</span>
         </button>
       </nav>
+
+      <AnimatePresence>
+        {isMoreMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 100 }}
+            className="more-menu-overlay"
+          >
+            {[
+              { id: 'plan-cuentas', icon: BookOpen, label: 'Cuentas' },
+              { id: 'reportes', icon: FileText, label: 'Reportes' },
+              { id: 'config', icon: Settings, label: 'Config' },
+              { id: 'perfil', icon: User, label: 'Perfil' },
+            ].map(item => (
+              <button
+                key={item.id}
+                className="more-menu-item"
+                onClick={() => {
+                  setActiveView(item.id);
+                  setIsMoreMenuOpen(false);
+                }}
+              >
+                <item.icon size={22} />
+                <span>{item.label}</span>
+              </button>
+            ))}
+            <button
+               className="more-menu-item"
+               style={{ color: 'var(--error)' }}
+               onClick={() => supabase.auth.signOut()}
+            >
+              <LogOut size={22} />
+              <span>Salir</span>
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Modal Nueva Empresa */}
       <AnimatePresence>

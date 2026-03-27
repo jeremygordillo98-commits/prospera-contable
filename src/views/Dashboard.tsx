@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, Users, PlusCircle, Upload, Loader2, PieChart } from 'lucide-react';
+import { TrendingUp, Users, PlusCircle, Upload, Loader2, PieChart, ArrowUpRight, ArrowDownRight, LayoutDashboard, Wallet, CreditCard } from 'lucide-react';
 import { supabase } from '../services/supabase';
 
 interface DashboardProps {
@@ -52,106 +52,192 @@ export const DashboardView: React.FC<DashboardProps> = ({ empresaId, onUploadCli
         fetchDashboardData();
     }, [empresaId]);
 
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0 }
+    };
+
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
             className="dashboard-content"
+            style={{ paddingBottom: '100px' }}
         >
-            <header className="flex-between">
+            <header className="flex-between" style={{ marginBottom: '40px' }}>
                 <div>
-                    <h1 className="h1">Panel de Control</h1>
-                    <p className="text-sec">Gestión financiera para esta cuenta.</p>
+                    <motion.h1 className="h1" style={{ fontSize: '2.5rem', fontWeight: 900, background: 'linear-gradient(to right, var(--text-main), var(--primary))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                        Panel de Control
+                    </motion.h1>
+                    <p className="text-sec" style={{ fontSize: '1.1rem', marginTop: '4px' }}>Gestión financiera inteligente para tu negocio</p>
                 </div>
-                <div className="flex gap-4">
-                    <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => alert("Módulo de asientos en construcción")}>
-                        <PlusCircle size={18} /> Nuevo Asiento
+                <div className="flex gap-4" style={{ display: 'flex', gap: '12px' }}>
+                    <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px', borderRadius: '14px', boxShadow: '0 10px 20px -5px rgba(99, 102, 241, 0.4)' }} onClick={() => alert("Módulo de asientos en construcción")}>
+                        <PlusCircle size={20} /> <span className="hide-mobile">Nuevo Asiento</span>
                     </button>
                     <button
                         onClick={onUploadClick}
                         className="btn glass-card"
-                        style={{ padding: '10px 15px', display: 'flex', alignItems: 'center', gap: '8px' }}
+                        style={{ padding: '12px 20px', display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid var(--border-color)', borderRadius: '14px' }}
                     >
-                        <Upload size={18} /> Cargar XML
+                        <Upload size={20} /> <span className="hide-mobile">Cargar XML</span>
                     </button>
                 </div>
             </header>
 
             {stats.loading ? (
-                <div style={{ padding: '60px 0', display: 'flex', justifyContent: 'center' }}>
-                    <Loader2 className="animate-spin" size={32} style={{ color: 'var(--primary)' }} />
+                <div style={{ padding: '100px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
+                    <Loader2 className="animate-spin" size={48} style={{ color: 'var(--primary)' }} />
+                    <p className="text-sec animate-pulse">Sincronizando con Supabase...</p>
                 </div>
             ) : (
                 <>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px', marginTop: '32px' }}>
-                        <div className="glass-card">
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+                        <motion.div variants={itemVariants} className="glass-card" style={{ position: 'relative', overflow: 'hidden' }}>
+                            <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '100px', height: '100px', background: 'var(--primary)', filter: 'blur(60px)', opacity: 0.2 }}></div>
                             <div className="flex-between">
-                                <span className="text-sec">Balance Actual</span>
-                                <TrendingUp size={20} className="text-success" />
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                    <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
+                                        <Wallet size={20} />
+                                    </div>
+                                    <span className="text-sec" style={{ fontWeight: 600 }}>Balance Total</span>
+                                </div>
+                                <ArrowUpRight size={20} className="text-success" />
                             </div>
-                            <div style={{ fontSize: '2rem', fontWeight: 800, margin: '12px 0' }}>${stats.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
-                            <div className="text-sec" style={{ fontSize: '0.8rem' }}>
-                                <span className="text-success">+12%</span> vs mes anterior
+                            <div style={{ fontSize: '2.5rem', fontWeight: 900, margin: '20px 0', letterSpacing: '-1px' }}>
+                                <span style={{ fontSize: '1.5rem', verticalAlign: 'super', marginRight: '4px', opacity: 0.6 }}>$</span>
+                                {stats.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                             </div>
-                        </div>
+                            <div className="flex-between">
+                                <div className="text-sec" style={{ fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    <span style={{ color: 'var(--success)', fontWeight: 700, background: 'rgba(16, 185, 129, 0.1)', padding: '2px 8px', borderRadius: '100px' }}>+12.5%</span> vs mes anterior
+                                </div>
+                                <TrendingUp size={16} className="text-success" style={{ opacity: 0.5 }} />
+                            </div>
+                        </motion.div>
 
-                        <div className="glass-card">
+                        <motion.div variants={itemVariants} className="glass-card" style={{ position: 'relative', overflow: 'hidden' }}>
+                            <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '100px', height: '100px', background: '#3B82F6', filter: 'blur(60px)', opacity: 0.15 }}></div>
                             <div className="flex-between">
-                                <span className="text-sec">Cuentas por Cobrar</span>
-                                <Users size={20} style={{ color: '#3B82F6' }} />
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                    <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(59, 130, 246, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3B82F6' }}>
+                                        <Users size={20} />
+                                    </div>
+                                    <span className="text-sec" style={{ fontWeight: 600 }}>Cuentas por Cobrar</span>
+                                </div>
+                                <ArrowUpRight size={20} style={{ color: '#3B82F6' }} />
                             </div>
-                            <div style={{ fontSize: '2rem', fontWeight: 800, margin: '12px 0' }}>${stats.cxc.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
-                            <div className="text-sec" style={{ fontSize: '0.8rem' }}>{stats.cxcCount} facturas pendientes</div>
-                        </div>
+                            <div style={{ fontSize: '2.5rem', fontWeight: 900, margin: '20px 0', letterSpacing: '-1px' }}>
+                                <span style={{ fontSize: '1.5rem', verticalAlign: 'super', marginRight: '4px', opacity: 0.6 }}>$</span>
+                                {stats.cxc.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                            </div>
+                            <div className="text-sec" style={{ fontSize: '0.85rem' }}>
+                                <strong style={{ color: 'var(--text-main)' }}>{stats.cxcCount}</strong> facturas pendientes de cobro
+                            </div>
+                        </motion.div>
 
-                        <div className="glass-card">
+                        <motion.div variants={itemVariants} className="glass-card" style={{ position: 'relative', overflow: 'hidden' }}>
+                            <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '100px', height: '100px', background: '#EF4444', filter: 'blur(60px)', opacity: 0.15 }}></div>
                             <div className="flex-between">
-                                <span className="text-sec">Cuentas por Pagar</span>
-                                <Users size={20} style={{ color: '#EF4444' }} />
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                    <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(239, 68, 68, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#EF4444' }}>
+                                        <CreditCard size={20} />
+                                    </div>
+                                    <span className="text-sec" style={{ fontWeight: 600 }}>Cuentas por Pagar</span>
+                                </div>
+                                <ArrowDownRight size={20} style={{ color: '#EF4444' }} />
                             </div>
-                            <div style={{ fontSize: '2rem', fontWeight: 800, margin: '12px 0' }}>${stats.cxp.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
-                            <div className="text-sec" style={{ fontSize: '0.8rem' }}>Consultar XML cargados</div>
-                        </div>
+                            <div style={{ fontSize: '2.5rem', fontWeight: 900, margin: '20px 0', letterSpacing: '-1px' }}>
+                                <span style={{ fontSize: '1.5rem', verticalAlign: 'super', marginRight: '4px', opacity: 0.6 }}>$</span>
+                                {stats.cxp.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                            </div>
+                            <div className="text-sec" style={{ fontSize: '0.85rem' }}>
+                                Próximos vencimientos detectados en XML
+                            </div>
+                        </motion.div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px', marginTop: '24px' }}>
-                        <div className="glass-card" style={{ height: '360px', display: 'flex', flexDirection: 'column' }}>
-                            <h3 style={{ marginBottom: '16px' }}>Últimas Transacciones</h3>
-                            <div style={{ flex: 1, overflowY: 'auto', paddingRight: '8px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px', marginTop: '32px' }}>
+                        <motion.div variants={itemVariants} className="glass-card" style={{ height: '420px', display: 'flex', flexDirection: 'column' }}>
+                            <div className="flex-between" style={{ marginBottom: '24px' }}>
+                                <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Últimas Transacciones</h3>
+                                <button className="btn" style={{ fontSize: '0.75rem', padding: '6px 12px', background: 'var(--primary-light)', color: 'var(--primary)', borderRadius: '8px' }}>Ver Todo</button>
+                            </div>
+                            <div style={{ flex: 1, overflowY: 'auto', paddingRight: '12px' }} className="custom-scrollbar">
                                 {transacciones.length > 0 ? (
                                     transacciones.map((tx, i) => {
                                         const total = tx.movimientos?.reduce((acc: number, mov: any) => acc + Number(mov.debe), 0) || 0;
                                         return (
-                                            <div key={tx.id || i} className="flex-between" style={{ padding: '12px 0', borderBottom: '1px solid var(--border-color)' }}>
-                                                <div>
-                                                    <div style={{ fontWeight: 600 }}>{tx.concepto}</div>
-                                                    <div className="text-sec" style={{ fontSize: '0.75rem' }}>
-                                                        {new Date(tx.fecha).toLocaleDateString()} • {tx.entidades?.razon_social || 'Varias entidades'}
+                                            <motion.div 
+                                                initial={{ opacity: 0, x: -10 }} 
+                                                animate={{ opacity: 1, x: 0 }} 
+                                                transition={{ delay: i * 0.1 }}
+                                                key={tx.id || i} 
+                                                className="flex-between" 
+                                                style={{ 
+                                                    padding: '16px', 
+                                                    marginBottom: '10px', 
+                                                    borderRadius: '16px', 
+                                                    background: 'rgba(255,255,255,0.02)',
+                                                    border: '1px solid rgba(255,255,255,0.03)'
+                                                }}
+                                            >
+                                                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                                                    <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), #8B5CF6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '1.2rem', fontWeight: 800 }}>
+                                                        {tx.concepto.charAt(0)}
+                                                    </div>
+                                                    <div>
+                                                        <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{tx.concepto}</div>
+                                                        <div className="text-sec" style={{ fontSize: '0.8rem', marginTop: '2px' }}>
+                                                            {new Date(tx.fecha).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })} • {tx.entidades?.razon_social || 'Varias entidades'}
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div style={{ textAlign: 'right' }}>
-                                                    <div style={{ fontWeight: 800 }}>${total.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
-                                                    <div className="text-sec" style={{ fontSize: '0.75rem', color: 'var(--success)' }}>Registrado</div>
+                                                    <div style={{ fontWeight: 900, fontSize: '1rem', color: 'var(--text-main)' }}>${total.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+                                                    <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--success)', marginTop: '2px' }}>Completo</div>
                                                 </div>
-                                            </div>
+                                            </motion.div>
                                         )
                                     })
                                 ) : (
-                                    <div style={{ textAlign: 'center', opacity: 0.5, paddingTop: '40px' }}>
-                                        <p>No hay transacciones recientes.</p>
+                                    <div style={{ textAlign: 'center', opacity: 0.5, paddingTop: '60px' }}>
+                                        <LayoutDashboard size={48} style={{ margin: '0 auto 16px', opacity: 0.2 }} />
+                                        <p style={{ fontWeight: 600 }}>Sin transacciones registradas</p>
+                                        <p style={{ fontSize: '0.8rem' }}>Tus movimientos contables aparecerán aquí.</p>
                                     </div>
                                 )}
                             </div>
-                        </div>
+                        </motion.div>
 
-                        <div className="glass-card" style={{ height: '360px', display: 'flex', flexDirection: 'column' }}>
-                            <h3 style={{ marginBottom: '16px' }}>Distribución de Gastos</h3>
+                        <motion.div variants={itemVariants} className="glass-card" style={{ height: '420px', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+                            <div style={{ position: 'absolute', bottom: '20px', right: '20px', width: '150px', height: '150px', background: 'var(--primary)', filter: 'blur(80px)', opacity: 0.1 }}></div>
+                            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '24px' }}>Distribución de Gastos</h3>
                             <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
-                                <PieChart size={120} style={{ opacity: 0.2, marginBottom: '16px' }} />
-                                <div className="text-sec" style={{ textAlign: 'center', fontSize: '0.85rem' }}>Agrega más datos para generar el gráfico</div>
+                                <motion.div
+                                    animate={{ rotate: 360 }}
+                                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                                >
+                                    <PieChart size={140} style={{ opacity: 0.1, color: 'var(--primary)' }} />
+                                </motion.div>
+                                <div style={{ marginTop: '24px', textAlign: 'center' }}>
+                                    <div className="text-sec" style={{ fontSize: '0.95rem', fontWeight: 600 }}>Gráficos Inteligentes</div>
+                                    <p className="text-sec" style={{ fontSize: '0.8rem', maxWidth: '200px', margin: '8px auto 0' }}>Sube tus facturas XML para generar reportes automáticos de gastos.</p>
+                                </div>
+                                <button className="btn" style={{ marginTop: '24px', background: 'transparent', border: '1px solid var(--border-color)', borderRadius: '12px', fontSize: '0.85rem' }}>Configurar categorías</button>
                             </div>
-                        </div>
+                        </motion.div>
                     </div>
                 </>
             )}
