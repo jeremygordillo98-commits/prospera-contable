@@ -104,20 +104,20 @@ export const Login = () => {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             onSubmit={handleAuth} 
-                            style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
+                            style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}
                         >
                             {view === 'register' && (
                                 <div className="input-group">
                                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '6px', color: 'var(--text-sec)' }}>Nombre Completo</label>
-                                    <div style={{ position: 'relative' }}>
-                                        <User size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-sec)' }} />
+                                    <div style={{ position: 'relative', width: '100%' }}>
+                                        <User size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-sec)', opacity: 0.7 }} />
                                         <input 
                                             type="text" 
                                             placeholder="Juan Pérez" 
                                             required 
                                             value={name}
                                             onChange={(e) => setName(e.target.value)}
-                                            style={{ width: '100%', padding: '10px 10px 10px 38px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', borderRadius: '10px', color: 'white', outline: 'none', fontSize: '0.85rem' }}
+                                            style={{ width: '100%', padding: '12px 12px 12px 42px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-color)', borderRadius: '12px', color: 'white', outline: 'none', fontSize: '0.9rem', transition: 'all 0.3s ease' }}
                                         />
                                     </div>
                                 </div>
@@ -125,15 +125,15 @@ export const Login = () => {
 
                             <div className="input-group">
                                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '6px', color: 'var(--text-sec)' }}>Correo Electrónico</label>
-                                <div style={{ position: 'relative' }}>
-                                    <Mail size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-sec)' }} />
+                                <div style={{ position: 'relative', width: '100%' }}>
+                                    <Mail size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-sec)', opacity: 0.7 }} />
                                     <input 
                                         type="email" 
                                         placeholder="hola@empresa.com" 
                                         required 
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        style={{ width: '100%', padding: '10px 10px 10px 38px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', borderRadius: '10px', color: 'white', outline: 'none', fontSize: '0.85rem' }}
+                                        style={{ width: '100%', padding: '12px 12px 12px 42px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-color)', borderRadius: '12px', color: 'white', outline: 'none', fontSize: '0.9rem', transition: 'all 0.3s ease' }}
                                     />
                                 </div>
                             </div>
@@ -141,20 +141,20 @@ export const Login = () => {
                             {view !== 'forgot' && (
                                 <div className="input-group">
                                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '6px', color: 'var(--text-sec)' }}>Contraseña</label>
-                                    <div style={{ position: 'relative' }}>
-                                        <Lock size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-sec)' }} />
+                                    <div style={{ position: 'relative', width: '100%' }}>
+                                        <Lock size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-sec)', opacity: 0.7 }} />
                                         <input 
                                             type={showPassword ? "text" : "password"} 
                                             placeholder="••••••••" 
                                             required 
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
-                                            style={{ width: '100%', padding: '10px 38px 10px 38px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', borderRadius: '10px', color: 'white', outline: 'none', fontSize: '0.85rem' }}
+                                            style={{ width: '100%', padding: '12px 42px 12px 42px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-color)', borderRadius: '12px', color: 'white', outline: 'none', fontSize: '0.9rem', transition: 'all 0.3s ease' }}
                                         />
                                         <button 
                                             type="button" 
                                             onClick={() => setShowPassword(!showPassword)} 
-                                            style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-sec)', cursor: 'pointer', padding: 0 }}
+                                            style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-sec)', cursor: 'pointer', padding: 0, opacity: 0.7 }}
                                         >
                                             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                                         </button>
@@ -165,15 +165,15 @@ export const Login = () => {
                             {view === 'register' && (
                                 <div className="input-group">
                                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '6px', color: 'var(--text-sec)' }}>Confirmar Contraseña</label>
-                                    <div style={{ position: 'relative' }}>
-                                        <Lock size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-sec)' }} />
+                                    <div style={{ position: 'relative', width: '100%' }}>
+                                        <Lock size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-sec)', opacity: 0.7 }} />
                                         <input 
                                             type={showPassword ? "text" : "password"} 
                                             placeholder="••••••••" 
                                             required 
                                             value={confirmPassword}
                                             onChange={(e) => setConfirmPassword(e.target.value)}
-                                            style={{ width: '100%', padding: '10px 10px 10px 38px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', borderRadius: '10px', color: 'white', outline: 'none', fontSize: '0.85rem' }}
+                                            style={{ width: '100%', padding: '12px 12px 12px 42px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-color)', borderRadius: '12px', color: 'white', outline: 'none', fontSize: '0.9rem', transition: 'all 0.3s ease' }}
                                         />
                                     </div>
                                 </div>
