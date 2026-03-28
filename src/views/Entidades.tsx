@@ -155,10 +155,12 @@ export const Entidades = ({ empresaId }: { empresaId: string }) => {
           const entidadesGrupo = filtered.filter(e => e.tipo_entidad === tipo);
           if (entidadesGrupo.length === 0 && search === "") return null;
 
+          const pluralLabel = tipo === 'Proveedor' ? 'Proveedores' : tipo + 's';
+
           return (
             <div key={tipo} className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
               <div style={{ padding: '16px 24px', background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: 'var(--primary)' }}>{tipo}s</h3>
+                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: 'var(--primary)' }}>{pluralLabel}</h3>
                 <span className="text-sec" style={{ fontSize: '0.8rem', fontWeight: 600 }}>{entidadesGrupo.length} registros</span>
               </div>
               
@@ -168,10 +170,12 @@ export const Entidades = ({ empresaId }: { empresaId: string }) => {
                     <table className="data-table desktop-table">
                       <thead>
                         <tr>
-                          <th>Razón Social / Nombre</th>
-                          <th>Identificación</th>
+                          <th>Nombre (Alias)</th>
+                          <th>Razón Social</th>
+                          <th>Identificación / RUC</th>
                           <th>Tipo Persona</th>
-                          <th>Contacto</th>
+                          <th>Correo</th>
+                          <th>Número de Celular</th>
                           <th style={{ textAlign: 'right' }}>Acciones</th>
                         </tr>
                       </thead>
@@ -179,23 +183,23 @@ export const Entidades = ({ empresaId }: { empresaId: string }) => {
                         {entidadesGrupo.map(e => (
                           <tr key={e.id}>
                             <td style={tdStyle}>
-                              <div style={{ fontWeight: 700 }}>{e.razon_social}</div>
-                              {e.nombre && <div className="text-sec" style={{ fontSize: '0.75rem' }}>{e.nombre}</div>}
+                              <div style={{ fontWeight: 700 }}>{e.nombre || '-'}</div>
                             </td>
+                            <td style={tdStyle}>{e.razon_social}</td>
                             <td style={tdStyle}>{e.ruc_cedula}</td>
                             <td style={tdStyle}>
                                <span style={{ fontSize: '0.8rem', opacity: 0.8 }}>{e.persona_tipo || 'Natural'}</span>
                             </td>
                             <td style={tdStyle}>
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                                {e.email && <div style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}><Mail size={12} /> {e.email}</div>}
-                                {e.telefono && <div style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}><Phone size={12} /> {e.telefono}</div>}
-                              </div>
+                              {e.email || '-'}
+                            </td>
+                            <td style={tdStyle}>
+                              {e.telefono || '-'}
                             </td>
                             <td style={{ ...tdStyle, textAlign: 'right' }}>
                               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-                                <button style={btnActionStyle} onClick={() => handleOpenModal(e)}><Edit2 size={16} /></button>
-                                <button style={{ ...btnActionStyle, color: 'var(--error)' }} onClick={() => handleDelete(e.id, e.razon_social)}><Trash2 size={16} /></button>
+                                <button style={btnActionStyle} onClick={() => handleOpenModal(e)} title="Editar"><Edit2 size={16} /></button>
+                                <button style={{ ...btnActionStyle, color: 'var(--error)' }} onClick={() => handleDelete(e.id, e.razon_social)} title="Eliminar"><Trash2 size={16} /></button>
                               </div>
                             </td>
                           </tr>
@@ -207,7 +211,7 @@ export const Entidades = ({ empresaId }: { empresaId: string }) => {
                       {entidadesGrupo.map(e => (
                         <div key={e.id} className="entity-card" style={{ padding: '16px', borderBottom: '1px solid var(--border-color)' }}>
                           <div className="flex-between" style={{ marginBottom: '8px' }}>
-                            <div style={{ fontWeight: 700 }}>{e.razon_social}</div>
+                            <div style={{ fontWeight: 700 }}>{e.nombre || e.razon_social}</div>
                             <span style={{ fontSize: '0.7rem', opacity: 0.7 }}>{e.persona_tipo}</span>
                           </div>
                           <div className="text-sec" style={{ fontSize: '0.8rem', marginBottom: '8px' }}>{e.ruc_cedula}</div>
@@ -227,7 +231,7 @@ export const Entidades = ({ empresaId }: { empresaId: string }) => {
                   </>
                 ) : (
                   <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-sec)', fontSize: '0.9rem' }}>
-                    No se encontraron {tipo.toLowerCase()}s
+                    No se encontraron {pluralLabel.toLowerCase()}
                   </div>
                 )}
               </div>
