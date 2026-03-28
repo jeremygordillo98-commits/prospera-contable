@@ -1,0 +1,494 @@
+﻿codigo;cuenta;tipo
+1;Activos;
+1.1;    Activo Corriente;
+1.1.1;        Efectivo y Equivalentes a Efectivo;
+1.1.1.1;            Caja;Caja
+1.1.1.2;            Caja Chica;Caja Chica
+1.1.1.3;            Banco Pichincha;Banco
+1.1.1.4;            Fondo Rotativo;Caja
+1.1.2;        Activos Financieros;
+1.1.2.1;            Activos Financieros con cambios en resultados;Activos Financieros con Cambios en Resultados
+1.1.2.2;            Activos Financieros Disponibles para la Venta;Activos Financieros disponibles para la Venta
+1.1.2.3;            Activos Financieros mantenidos hasta el vencimiento;Activos Financieros mantenidos hasta el Vencimiento
+1.1.2.4;            (-) Provisión por Deterioro;(-) Provisión por Deterioro
+1.1.2.5;            Cuentas por Cobrar;
+1.1.2.5.1;                Clientes Comerciales;Cuenta por Cobrar
+1.1.2.5.2;                Clientes Comerciales Exterior;Cuenta por Cobrar del Exterior
+1.1.2.5.3;                Socios o Accionistas;Cuenta por Cobrar Relacionadas
+1.1.2.5.4;                Funcionarios y/o Empleados;Cuenta por Cobrar Relacionadas
+1.1.2.5.5;                Compañías Relacionadas;Cuenta por Cobrar Relacionadas
+1.1.2.5.6;                Cheques por Cobrar;Cuenta por Cobrar
+1.1.2.5.7;                Tarjeta de crédito (Cobro);Cuenta por Cobrar (Tarjetas de Crédito)
+1.1.2.5.8;                Fidelizaciones Externas;Cuenta por Cobrar
+1.1.2.6;            Documentos por Cobrar;
+1.1.2.6.1;                Clientes Comerciales (Documentos por Cobrar);Documento por Cobrar
+1.1.2.6.2;                Socios o Accionistas;Documento por Cobrar Relacionadas
+1.1.2.6.3;                Funcionarios y/o Empleados;Documento por Cobrar Relacionadas
+1.1.2.6.4;                Compañías Relacionadas;Documento por Cobrar Relacionadas
+1.1.2.7;            Otras Cuentas por Cobrar;Cuenta por Cobrar
+1.1.2.7.1;                SuperEasy;Cuenta por Cobrar (Tarjetas de Crédito)
+1.1.2.7.2;                Uber;Cuenta por Cobrar (Tarjetas de Crédito)
+1.1.2.7.3;                PedidosYa;Cuenta por Cobrar (Tarjetas de Crédito)
+1.1.2.7.4;                Rappi;Cuenta por Cobrar (Tarjetas de Crédito)
+1.1.2.7.5;                Picker;Cuenta por Cobrar (Tarjetas de Crédito)
+1.1.2.8;            Provision para Cuentas Incobrables;Cuenta por Cobrar
+1.1.3;        Inventario;
+1.1.3.1;            Materia Prima;Materia Prima
+1.1.3.2;            Producto en Proceso;Productos en Proceso
+1.1.3.3;            Suministros o materiales a ser consumidos en el proceso de producción ;Suministros o Materiales a ser Consumidos en el Proceso de Producción
+1.1.3.4;            Suministros o materiales a ser consumidos en la prestación de servicios;Suministros o Materiales a ser Consumidos en la prestación de Servicios
+1.1.3.5;            Productos terminados y mercadería producidos por la compañía;Productos terminados y mercadería producidos por la compañía 
+1.1.3.6;            Productos terminados y mercadería comprados a terceros;Productos terminados y mercadería comprados a terceros
+1.1.3.7;            Mercaderías en Transito;Mercaderías en Transito 
+1.1.3.8;            Obras en Construcción;Obras en Construcción 
+1.1.3.9;            Inventarios repuestos, herramientas y accesorios;Inventarios, repuestos, herramientas y accesorios
+1.1.3.10;            Otros Inventarios;Otros Inventarios
+1.1.3.11;            (-) Provisión de Inventarios por valor neto de realización;(-) Provision de Inventarios por valor neto de realización 
+1.1.3.12;            (-) Provisión de Inventarios por deterioro;(-) Provision de Inventarios por deterioro
+1.1.4;        Servicios y otros Pagos Anticipados;
+1.1.4.1;            Seguros;Seguros pagados por Anticipado
+1.1.4.2;            Garantía de arriendo;Arriendos Pagados por Anticipado
+1.1.4.3;            Anticipo a Proveedores;Anticipo Proveedores
+1.1.4.4;            Otros Anticipos Entregados;Otros Anticipos Entregados
+1.1.5;        Activos por Impuestos Corrientes;
+1.1.5.1;            IVA sobre Compras;
+1.1.5.1.1;                IVA sobre Compras;Credito Tributario a favor de la Empresa (IVA)
+1.1.5.2;            Retenciones del IVA;
+1.1.5.2.1;                30% Bienes;Credito Tributario a favor de la Empresa (IVA)
+1.1.5.2.2;                70% Servicios;Credito Tributario a favor de la Empresa (IVA)
+1.1.5.2.3;                100% Honorarios, Arrendamientos, Personas Naturales;Credito Tributario a favor de la Empresa (IVA)
+1.1.5.2.4;                100% Exportadores;Credito Tributario a favor de la Empresa (IVA)
+1.1.5.2.5;                10% Bienes (Contribuyentes Especiales);Credito Tributario a favor de la Empresa (IVA)
+1.1.5.2.6;                20% Servicios (Contribuyentes Especiales);Credito Tributario a favor de la Empresa (IVA)
+1.1.5.2.7;                50% Servicios (Exportadores de Recursos Naturales No Renovables);Credito Tributario a favor de la Empresa (IVA)
+1.1.5.2.8;                100% Empresas Públicas;Credito Tributario a favor de la Empresa (IVA)
+1.1.5.2.9;                100% Liquidación de Compra de Bienes y Servicios;Credito Tributario a favor de la Empresa (IVA)
+1.1.5.2.10;                Retención IVA 0;Credito Tributario a favor de la Empresa (IVA)
+1.1.5.2.11;                100% Contribuyentes Especiales;Credito Tributario a favor de la Empresa (IVA)
+1.1.5.2.12;                100% Operadores de turismo;Credito Tributario a favor de la Empresa (IVA)
+1.1.5.3;            Retenciones en la Fuente del Impuesto a la Renta;
+1.1.5.3.1;                Retenciones renta 2024;Credito Tributario a favor de la Empresa (IR)
+1.1.5.3.2;                2% Servicios Tarjeta de crédito;Credito Tributario a favor de la Empresa (IR)
+1.1.5.3.3;                Retenciones renta 2025;Credito Tributario a favor de la Empresa (IR)
+1.1.5.3.4;                1% Retenciones;Credito Tributario a favor de la Empresa (IR)
+1.1.5.3.5;                8% deportistas;Credito Tributario a favor de la Empresa (IR)
+1.1.5.3.6;                15% Loterías, Rifas y Similares;Credito Tributario a favor de la Empresa (IR)
+1.1.5.3.7;                Otras Retenciones Aplicables al Cód. 343;Credito Tributario a favor de la Empresa (IR)
+1.1.5.3.8;                2.75% Servicios;Credito Tributario a favor de la Empresa (IR)
+1.1.5.3.9;                1.75% Bienes Muebles de Naturaleza Corporal;Credito Tributario a favor de la Empresa (IR)
+1.1.5.3.10;                1.75% Régimen Microempresas;Credito Tributario a favor de la Empresa (IR)
+1.1.5.3.11;                Otras autoretenciones;Credito Tributario a favor de la Empresa (IR)
+1.1.5.3.12;                Impuesto único a ingresos provenientes de actividades agropecuarias;Credito Tributario a favor de la Empresa (IR)
+1.1.5.4;            Anticipo de Impuesto a Renta;
+1.1.5.4.1;                1era. Cuota Julio;Anticipo de Impuesto a la Renta
+1.1.5.4.2;                2da. Cuota Septiembre;Anticipo de Impuesto a la Renta
+1.1.6;        Activos No Corrientes Mantenidos para la Venta y Op. desc.;Activos No Corrientes mantenidos para la Venta y descontinuadas.
+1.1.7;        Otros Activos Corrientes;Otros Activos Corrientes
+1.2;    Activos No Corrientes;
+1.2.1;        Propiedad, Planta y Equipos;
+1.2.1.1;            Terrenos;Terrenos
+1.2.1.2;            Edificios;Edificios
+1.2.1.3;            Construcciones en Curso ;Construcciones en Curso
+1.2.1.4;            Instalaciones ;Instalaciones
+1.2.1.5;            Muebles y Enseres;Muebles y Enseres
+1.2.1.6;            Maquinarias y Equipos;Maquinarias y Equipos
+1.2.1.7;            Equipos de Computación;Equipos de Computación
+1.2.1.8;            Vehículos, equipos de transporte y equipo caminero móvil;Vehiculo, equipos de transporte y equipo caminero movil
+1.2.1.9;            Otras Propiedades, Planta y Equipo;Otras Propiedades, Planta y Equipo
+1.2.1.10;            Repuestos y Herramientas;Repuestos y Herramientas 
+1.2.1.11;            (-) Depreciación Acumulada Propiedades, Planta y Equipo;(-) Depreciación Acumulada Propiedades, Planta  y Equipo 
+1.2.1.12;            (-) Deterioro Acumulado Propiedades, Planta y Equipo;(-) Deterioro Acumulado Propiedades, Planta y Equipo
+1.2.1.13;            Activos de Exploración y Explotación ;Activos de Exploración y Explotación 
+1.2.1.14;            Naves, Aeronaves, Barcazas y Similares;Naves, Aeronaves, Barcazas y Similares
+1.2.2;        Propiedades de Inversion;
+1.2.2.1;            Terrenos;Terrenos de Inversión
+1.2.2.2;            Edificios;Edificios de Inversión
+1.2.2.3;            (-) Depreciación Acumulada de Propiedades de Inversión;(-) Deterioro Acumulado de Propiedades de Inversión
+1.2.2.4;            (-) Deterioro Acumulado de Propiedades de Inversión;(-) Deterioro Acumulado de Propiedades de Inversión
+1.2.3;        Activos Biológicos;
+1.2.3.1;            Animales Vivos en Crecimiento;Activo fijo
+1.2.3.2;            Animales Vivos en Producción;Activo fijo
+1.2.3.3;            (-) Depreciación Activos Biológicos;Activo fijo
+1.2.3.4;            (-) Deterioro Activos Biológicos;Activo fijo
+1.2.4;        Intangibles;
+1.2.4.1;            Plusvalías;Plusvalías
+1.2.4.2;            Marcas, Patentes, Derechos de Llave, Cuotas Patrimoniales;Marcas, Patentes, Derechos de Llave, Cuotas Patrimoniales
+1.2.4.3;            Activos de Exploración y Explotación;Activos de Exploración y Explotación 
+1.2.4.4;            (-) Amortización Acumulada de Activos Intangibles;(-) Amortización Acumulada de Activos Intangibles
+1.2.4.5;            (-) Deterioro Acumulado de Activos Intangibles;(-) Deterioro Acumulado de Activos Intangibles
+1.2.4.6;            Otros Activos Intangibles;Otros Activos Intangibles
+1.2.5;        Activos por Impuestos Diferidos;Activos por Impuestos Diferidos
+1.2.6;        Activos Financieros No Corrientes;
+1.2.6.1;            Activos Financieros mantenidos hasta el Vencimiento No Corrientes;Activos Financieros hasta el vencimiento No Corrientes
+1.2.6.2;            (-) Deterioro de Activos Financieros hasta el Vencimiento No Corrientes;(-) Deterioro de Activos Financieros hasta el vencimiento No Corrientes
+1.2.6.3;            Documentos y Cuentas por Cobrar No Corrientes;Documentos y Cuentas por Cobrar No Corrientes
+1.2.6.4;            (-) Cuentas Incobrables de Activos Financieros No Corrientes;(-) Cuenta Incobrables de Activos Financieros No Corrientes
+1.2.7;        Otros Activos No Corrientes;Otros Activos No Corrientes
+2;Pasivos;
+2.1;    Pasivo Corriente;
+2.1.1;        Pasivos Financieros con Cambios en Resultados;Pasivos Financieros con cambio en Resultados
+2.1.2;        Pasivos por Contratos de Arrendamientos Financieros;Pasivos por Contratos de Arrendamiento Financieros
+2.1.3;        Cuentas y Documentos por Pagar;
+2.1.3.1;            Cuentas por Pagar;
+2.1.3.1.1;                Proveedores;Cuenta por Pagar
+2.1.3.1.2;                Proveedores Exterior;Cuenta por Pagar del Exterior
+2.1.3.2;            Documentos por Pagar;
+2.1.3.2.1;                Documentos por Pagar Proveedores;Documento por Pagar
+2.1.3.2.2;                Documentos por Pagar Proveedores Exterior;Documento por Pagar del Exterior
+2.1.4;        Obligaciones Con Instituciones Financieras;
+2.1.4.1;            Obligaciones con Instituciones Financieras Locales;Obligaciones con Instituciones Financieras Locales
+2.1.4.2;            Obligaciones con Instituciones Financieras del Exterior;Obligaciones con Instituciones Financieras del Exterior
+2.1.4.3;            Tarjeta de crédito (Pago);Cuenta por Pagar (Tarjetas de Crédito)
+2.1.5;        Provisiones;Cuenta por Pagar
+2.1.5.1;            Provisiones Locales;Cuenta por Pagar
+2.1.5.2;            Provisiones del Exterior;Cuenta por Pagar
+2.1.6;        Porcion Corriente de Obligaciones Emitidas;Porción Corriente de Obligaciones Emitidas
+2.1.7;        Otras Obligaciones Corrientes;
+2.1.7.1;            Retenciones del I.E.S.S.;
+2.1.7.1.1;                9.35% Aportes Individuales;Obligaciones Sociales con el IESS
+2.1.7.1.2;                Prestamos Quirografarios;Obligaciones Sociales con el IESS
+2.1.7.1.3;                Prestamos Hipotecarios;Obligaciones Sociales con el IESS
+2.1.7.2;            Retenciones en la Fuente de Impuestos a la Renta;
+2.1.7.2.1;                1% Bienes Muebles de Naturaleza Corporal;Obligaciones Tributarias
+2.1.7.2.2;                2% Servicios;Obligaciones Tributarias
+2.1.7.2.3;                8% Honorarios, Arrendamientos, Docencia, Deportistas;Obligaciones Tributarias
+2.1.7.2.4;                25% Extranjeros No Residentes;Obligaciones Tributarias
+2.1.7.2.5;                10% Honorarios Profesionales y Dietas;Obligaciones Tributarias
+2.1.7.2.6;                15% Loterías, Rifas y Similares;Obligaciones Tributarias
+2.1.7.2.7;                Otras Retenciones Aplicables al Cód. 343;Obligaciones Tributarias
+2.1.7.2.8;                2.75% Servicios;Obligaciones Tributarias
+2.1.7.2.9;                1.75% Bienes Muebles de Naturaleza Corporal;Obligaciones Tributarias
+2.1.7.2.10;                1.75% Régimen Microempresas;Obligaciones Tributarias
+2.1.7.2.11;                Otras autoretenciones;Obligaciones Tributarias
+2.1.7.2.12;                Impuesto único a ingresos provenientes de actividades agropecuarias;Obligaciones Tributarias
+2.1.7.3;            Retenciones del Impuesto al Valor Agregado;
+2.1.7.3.1;                30% Bienes;Obligaciones Tributarias
+2.1.7.3.2;                70% Servicios;Obligaciones Tributarias
+2.1.7.3.3;                100% Honorarios, Arrendamientos;Obligaciones Tributarias
+2.1.7.3.4;                100% Exportadores;Obligaciones Tributarias
+2.1.7.3.5;                10% Bienes (Contribuyentes Especiales);Obligaciones Tributarias
+2.1.7.3.6;                20% Servicios (Contribuyentes Especiales);Obligaciones Tributarias
+2.1.7.3.7;                50% Servicios (Exportadores de Recursos Naturales No Renovables);Obligaciones Tributarias
+2.1.7.3.8;                100% Empresas Públicas;Obligaciones Tributarias
+2.1.7.3.9;                100% Liquidación de Compra de Bienes y Servicios;Obligaciones Tributarias
+2.1.7.3.10;                100% Contribuyentes Especiales;Obligaciones Tributarias
+2.1.7.3.11;                100% Operadores de turismo;Obligaciones Tributarias
+2.1.7.4;            IVA Sobre Ventas;
+2.1.7.4.1;                IVA sobre Ventas;Obligaciones Tributarias
+2.1.7.5;            Impuestos por Pagar;
+2.1.7.5.1;                Impuesto a la Renta Cía.;Impuesto a la Renta por Pagar
+2.1.7.5.2;                Impuesto a la Junta de Beneficiencia;Obligaciones Tributarias
+2.1.7.5.3;                Impuesto a los Activos Totales;Obligaciones Tributarias
+2.1.7.5.4;                Impuestos a la Universidad de Guayaquil;Obligaciones Tributarias
+2.1.7.5.5;                Impuestos Prediales;Obligaciones Tributarias
+2.1.7.5.6;                Impuesto a los Consumos Especiales;Obligaciones Tributarias
+2.1.7.6;            Beneficios Sociales por Pagar;
+2.1.7.6.1;                Décimo Tercer Sueldo;Obligaciones Sociales con el IESS
+2.1.7.6.2;                Décimo Cuarto Sueldo;Obligaciones Sociales con el IESS
+2.1.7.6.3;                Vacaciones;Obligaciones Sociales con el IESS
+2.1.7.6.4;                11.15% Aportes Patronales I.E.S.S.;Obligaciones Sociales con el IESS
+2.1.7.6.5;                1% Secap - Iece;Obligaciones Sociales con el IESS
+2.1.7.6.6;                Fondos de Reservas;Obligaciones Sociales con el IESS
+2.1.7.6.7;                Provisión de Jubilación Patronal;Obligaciones Sociales con el IESS
+2.1.7.6.8;                Provisión por Desahucio;Obligaciones Sociales con el IESS
+2.1.7.7;            Nominas;
+2.1.7.7.1;                Sueldos por Pagar;Obligaciones Sociales con el IESS
+2.1.7.8;            Participación de Trabajadores;
+2.1.7.8.1;                10% Trabajadores en General;Participación Trabajadores por Pagar del Ejercicio
+2.1.7.8.2;                5% Cargas Familiares;Participación Trabajadores por Pagar del Ejercicio
+2.1.7.9;            Dividendos por Pagar a Socios;Dividendos por Pagar
+2.1.8;        Cuentas por Pagar Diversas/Relacionadas;
+2.1.8.1;            Cuenta por Pagar Gabriela Betancourt;Cuenta por Pagar Relacionadas
+2.1.8.2;            Cuenta por Pagar Esteban Ricaurte;Cuenta por Pagar Relacionadas
+2.1.8.3;            Cuenta por Pagar Compañías Relacionadas;Cuenta por Pagar Relacionadas
+2.1.8.4;            Cuenta por Pagar Compañías Relacionadas del Exterior;Cuenta por Pagar Relacionadas
+2.1.8.5;            Documentos por Pagar Funcionarios y/o Empleados;Documento por Pagar Relacionadas
+2.1.8.6;            Documentos por Pagar Compañías Relacionadas;Documento por Pagar Relacionadas
+2.1.8.7;            Cuenta por Pagar Funcionarios y/o Empleados (10% Servicio);Cuenta por Pagar Relacionadas
+2.1.9;        Préstamo Roberto Betancourt por pagar;Otros Pasivos Financieros
+2.1.10;        Anticipos de Clientes;Anticipo de Clientes
+2.1.11;        Pasivos directamente relacionados con los Activos No Corrientes;Pasivos directamente relacionados con Activos No Corrientes
+2.1.12;        Porción Corriente de Provisiones por Beneficios a Empleados;
+2.1.12.1;            Jubilación Patronal;Jubilación Patronal
+2.1.12.2;            Otros Beneficios a largo Plazo para los Empleados;Cuenta por Pagar
+2.1.13;        Otros Pasivos Corrientes;Otros Pasivos Corrientes
+2.1.14;        Anticipo Gastos Administrativos;Anticipo de Clientes
+2.2;    Pasivo No Corriente;
+2.2.1;        Pasivos por Contratos de Arrendamiento Financiero;Pasivos por Contratos de Arrendamiento Financiero No Corrientes
+2.2.2;        Cuentas y Documentos por Pagar;
+2.2.2.1;            Cuentas por Pagar;
+2.2.2.1.1;                Proveedores No Corriente;Cuenta por Pagar No Corriente
+2.2.2.1.2;                Proveedores Exterior No Corriente;Cuenta por Pagar del Exterior No Corriente
+2.2.2.2;            Documentos por Pagar;
+2.2.2.2.1;                Documento por Pagar Proveedores No Corriente;Documento por Pagar No Corriente
+2.2.2.2.2;                Documentos por Pagar Proveedores Exterior No Corriente;Documento por Pagar del Exterior No Corriente
+2.2.3;        Obligaciones con Instituciones Financieras;
+2.2.3.1;            Obligaciones con Instituciones Financieras Locales No Corrientes;Obligaciones con Instituciones Financieras locales No Corrientes
+2.2.3.2;            Obligaciones con Instituciones Financieras del Exterior No Corriente;Obligaciones con Instituciones Financieras del Exterior No Corriente
+2.2.4;        Cuenta por Pagar Diversas/Relacionadas;
+2.2.4.1;            Cuenta por Pagar Socios o Accionistas No Corrientes;Cuenta por Pagar Relacionadas No Corriente
+2.2.4.2;            Cuenta por Pagar Funcionarios y/o Empleados No Corriente;Cuenta por Pagar Relacionadas No Corriente
+2.2.4.3;            Cuenta por Pagar Compañias Relacionadas No Corriente;Cuenta por Pagar Relacionadas No Corriente
+2.2.4.4;            Cuenta por Pagar Compañías Relacionadas del Exterior No Corriente;Cuenta por Pagar Compañías Relacionadas del Ext No Corriente
+2.2.5;        Obligaciones Emitidas;Obligaciones Emitidas No Corrientes
+2.2.6;        Anticipos de Clientes;Anticipos de Clientes No Corrientes
+2.2.7;        Provisiones por Beneficios a Empleados;
+2.2.7.1;            Jubilación Patronal;Obligaciones por Beneficios de Ley No Corrientes
+2.2.7.2;            Otros Beneficios No Corrientes Para los Empleados;Otros Beneficios para los Empleados No Corrientes
+2.2.8;        Pasivo Diferido;
+2.2.8.1;            Ingresos Diferidos;Pasivos por Ingresos Diferidos
+2.2.8.2;            Pasivos por Impuestos Diferidos;Pasivos por Impuestos Diferidos
+2.2.9;        Otros Pasivos No Corrientes;Otros Pasivos No Corrientes
+3;Patrimonio;
+3.1;    Patrimonio Atribuible a Propietarios;
+3.1.1;        Capital Social;
+3.1.1.1;            Capital Social suscrito o pagado;Capital Social Suscrito o Pagado
+3.1.1.2;            (-) Capital suscrito no pagado, acciones en tesorería;(-) Capital Suscrito no Pagado, Acciones en Tesorería
+3.1.2;        Aportes de Socios o Accionistas para Futura Capitalización ;Aportes de Socios o Accionistas para Futura Capitalización
+3.1.3;        Prima por Emisión Primaria de Acciones;Prima por emisión Primaria de Acciones
+3.1.4;        Reservas;
+3.1.4.1;            Legal;Legal
+3.1.4.2;            Facultativa y Estatutaria;Facultativa y Estatuaria
+3.1.4.3;            Reserva de Capital;Reserva de Capital 
+3.1.5;        Otros Resultados Integrales;
+3.1.5.1;            Superávit por Valuación de Activos Financieros;Superávit por Valuación de Activos Financieros
+3.1.5.2;            Superávit por Revaluación de Propiedad, Plantas y Equipos;Superávit por Revaluación de Propiedad, Plantas y Equipos
+3.1.5.3;            Superávit por Valuación de Activos Intagibles;Superávit por Revaluacion de Activos Intangibles
+3.1.5.4;            Otros Superávit por Revaluación;Otros Superávit por Revaluacion
+3.1.6;        Resultados Acumulados;
+3.1.6.1;            Resultados Acumulados;Ganancias Acumuladas
+3.1.6.2;            Resultados provenientes de la adopción por 1era vez del las NIIF;Resultados provenientes de la adopción por 1era vez del las NIIF
+3.1.7;        Resultado del Ejercicio;
+3.1.7.1;            Resultado del Ejercicio;Ganancia neta el Ejercicio
+3.2;    Participación No Controladas;
+3.2.1;        Participación No Controladas;Participación No Controladas
+4;Ingresos;
+4.1;    Ingresos de Actividades Ordinarias;
+4.1.1;        Venta de Bienes;Ingresos por Ventas de Bienes
+4.1.2;        Prestación de Servicios;Ingresos por Prestación de Servicios
+4.1.2.1;            Sesión de terapia individual;Ingresos por Prestación de Servicios
+4.1.2.2;            Servicios Profesionales en Psicoterapia;Ingresos por Prestación de Servicios
+4.1.2.3;            Programa de atención Psicológica;Ingresos por Prestación de Servicios
+4.1.3;        Devoluciones sobre Ventas;Devoluciones sobre Ventas
+4.1.4;        Rebaja y/o Descuentos sobre Ventas;Rebaja y/o Descuentos sobre Ventas
+4.1.5;        Ingresos por Regalías Cuotas y Comisiones;Ingresos por Regalías,  Cuotas y Comisiones
+4.1.6;        Ingresos por Contratos de Intermediación;Ingresos por Contratos de Intermediación
+4.1.7;        Ingresos por Primas y Prestaciones;Ingresos Primas y Prestaciones
+4.1.8;        Contratos de Construcción;Contratos de Construcción
+4.1.9;        Subvenciones del Gobierno;Subvenciones de Gobierno
+4.1.10;        Ingresos por Dividendos;Ingresos por Dividendos
+4.1.11;        Otros Ingresos de Actividades Ordinarias;Otros Ingresos de Actividades Ordinarias
+4.2;    Otros Ingresos de Actividades Ordinarias;
+4.2.1;        Fletes;Fletes de Actividades Ordinarias
+4.2.2;        Multas;Multas de Actividades Ordinarias
+4.2.3;        Intereses;Intereses de Actividades Ordinarias
+4.2.4;        Propinas (No Gravables);Propinas de Actividades Ordinarias No Gravables
+4.2.5;        Ingreso venta de equipos de computo KG;Otros Ingresos de Actividades Ordinarias
+4.3;    Otros Ingresos Financieros;
+4.3.1;        Dividendos Financieros;Dividendos Financieros
+4.3.2;        Intereses Financieros;Intereses Financieros
+4.3.3;        Ganancia de Asociadas y Negocios Conjuntos;Ganancia de Asociadas y Negocios Conjuntos
+4.3.4;        Valuación de Instrumentos Financieros;Valuación de Instrumentos Financieros
+4.3.5;        Otras Rentas;Otras Rentas
+4.4;    Ingresos por Operaciones Discontinuadas;Ingresos por Operaciones discontinuadas
+5;Costos y Gastos;
+5.1;    Costos de Venta y Producción ;
+5.1.1;        Materiales Utilizados o Productos Vendidos ;
+5.1.1.1;            Bienes No Producidos;Bienes No Producidos
+5.1.1.2;            Bienes No Producidos Importados;Bienes No Producidos Importados
+5.1.1.3;            Materia Prima;Materia Prima - Costo de Venta
+5.1.1.4;            Materia Prima Importada;Materia Prima Importada - Costo de Venta
+5.1.1.5;            Productos en Proceso;Productos en Proceso - Costo de Venta
+5.1.1.6;            Productos Terminados;Productos Terminados - Costo de Venta
+5.1.2;        Mano de Obra Directa;
+5.1.2.1;            Sueldos Mano de Obra Directa;Sueldos y Beneficios Sociales - Directa
+5.1.2.2;            Sobretiempos Mano de Obra Directa;Sueldos y Beneficios Sociales - Directa
+5.1.2.3;            Décimo Tercer Sueldo Mano de Obra Directa;Sueldos y Beneficios Sociales - Directa
+5.1.2.4;            Decimo Cuarto Sueldo Mano de Obra Directa;Sueldos y Beneficios Sociales - Directa
+5.1.2.5;            Vacaciones Mano de Obra Directa;Sueldos y Beneficios Sociales - Directa
+5.1.2.6;            Aportes Patronales al I.E.S.S. Mano de Obra Directa;Sueldos y Beneficios Sociales - Directa
+5.1.2.7;            Secap - Iece Mano de Obra Directa;Sueldos y Beneficios Sociales - Directa
+5.1.2.8;            Fondos de Reserva Mano de Obra Directa;Sueldos y Beneficios Sociales - Directa
+5.1.2.9;            Gastos Planes de Beneficios a Empleados Mano de Obra Directa;Gastos Planes de Beneficios a Empleados - Directa
+5.1.3;        Mano de Obra Indirecta;
+5.1.3.1;            Sueldos Mano de Obra Indirecta;Sueldos y Beneficios Sociales - Indirecta
+5.1.3.2;            Sobretiempos Mano de Obra Indirecta;Sueldos y Beneficios Sociales - Indirecta
+5.1.3.3;            Décimo Tercer Sueldo Mano de Obra Indirecta;Sueldos y Beneficios Sociales - Indirecta
+5.1.3.4;            Décimo Cuarto Sueldo Mano de Obra Indirecta;Sueldos y Beneficios Sociales - Indirecta
+5.1.3.5;            Vacaciones Mano de Obra Indirecta;Sueldos y Beneficios Sociales - Indirecta
+5.1.3.6;            Aportes Patronales al I.E.S.S. Mano de Obra Indirecta;Sueldos y Beneficios Sociales - Indirecta
+5.1.3.7;            Secap - Iece Mano de Obra Indirecta;Sueldos y Beneficios Sociales - Indirecta
+5.1.3.8;            Fondos de Reserva Mano de Obra Indirecta;Sueldos y Beneficios Sociales - Indirecta
+5.1.3.9;            Gastos Planes de Beneficios a Empleados - Indirecta;Gastos Planes de Beneficios a Empleados - Indirecta
+5.1.4;        Costos Indirectos de Fabricación;
+5.1.4.1;            Depreciación Propiedades, Plantas y Equipos;Depreciación Propiedades, Plantas y Equipos
+5.1.4.2;            Depreciación de Activos Biológicos;Depreciación de Activos Biológicos
+5.1.4.3;            Deterioro de Propiedad, Planta y Equipo;Deterioro de Propiedad, Planta y Equipo
+5.1.4.4;            Efecto valor neto de realización de Inventarios;Efecto valor neto de realización de Inventarios
+5.1.4.5;            Gasto por Garantías en Venta de Productos o Servicios;Gasto por Garantías en Venta de Productos o Servicios
+5.1.4.6;            Mantenimiento y Reparaciones Costos;Mantenimiento y Reparaciones Costos
+5.1.4.7;            Suministros, Materiales y Repuestos Costos;Suministros, Materiales y Repuestos Costos
+5.1.4.8;            Otros Costos de Producción;Otros Costos de Producción
+5.2;    Gastos;
+5.2.1;        Gastos de Actividades Ordinarias;
+5.2.1.1;            Ventas;
+5.2.1.1.1;                Sueldos Unificados Vtas.;Sueldos y Beneficios Sociales
+5.2.1.1.2;                Sobretiempos Vtas.;Sueldos, Salarios y demás Remuneraciones Vtas
+5.2.1.1.3;                Gratificaciones Vtas. ;Sueldos, Salarios y demás Remuneraciones Vtas
+5.2.1.1.4;                Alimentación Vtas.;Sueldos, Salarios y demás Remuneraciones Vtas
+5.2.1.1.5;                Aportes Patronales al IESS Vtas.;Aportes a la Seguridad Social Vtas
+5.2.1.1.6;                Secap - Iece Vtas.;Aportes a la Seguridad Social Vtas
+5.2.1.1.7;                Fondos de Reserva Vtas.;Aportes a la Seguridad Social Vtas
+5.2.1.1.8;                Décimo Tercer Sueldo Vtas.;Beneficios Sociales e Indemnizaciones Vtas
+5.2.1.1.9;                Décimo Cuarto Sueldo Vtas.;Beneficios Sociales e Indemnizaciones Vtas
+5.2.1.1.10;                Vacaciones Vtas.;Beneficios Sociales e Indemnizaciones Vtas
+5.2.1.1.11;                Desahucio Vtas.;Beneficios Sociales e Indemnizaciones Vtas
+5.2.1.1.12;                Gastos Planes de Beneficios a Empleados Vtas;Gastos Planes de Beneficios a Empleados Vtas
+5.2.1.1.13;                Honorarios Profesionales Psicoterapia Vtas.;Gastos Honorarios, Comisiones y Dietas a PN Vtas
+5.2.1.1.14;                Honorarios Profesionales Psicoterapia Sc Vtas.;Gastos Honorarios, Comisiones y Dietas a PN Vtas
+5.2.1.1.15;                Gastos Remuneraciones a otros trabajadores autónomos Vtas;Gastos Remuneraciones a otros trabajadores autónomos Vtas
+5.2.1.1.16;                Gastos Honorarios a extranjeros por Servicios Ocasionales Vtas;Gastos Honorarios a extranjeros por Servicios Ocasionales Vtas
+5.2.1.1.17;                Mantenimiento de Local;Gastos de Mantenimiento, Repuestos y Reparaciones Vtas
+5.2.1.1.18;                Reparaciones de Equipos Vtas.;Gastos de Mantenimiento, Repuestos y Reparaciones Vtas
+5.2.1.1.19;                Arriendos Vtas;Gastos Arrendamiento Operativo Vtas
+5.2.1.1.20;                Comisiones Vtas;Comisiones Vtas
+5.2.1.1.21;                Publicidad y Promoción Vtas.;Gastos Promociones y Publicidad Vtas
+5.2.1.1.22;                Publicaciones y Agencias Vtas.;Gastos Promociones y Publicidad Vtas
+5.2.1.1.23;                Combustible Vtas.;Gastos Combustibles Vtas
+5.2.1.1.24;                Lubricantes Vtas.;Gastos Lubricantes Vtas
+5.2.1.1.25;                Seguros Vtas.;Gastos Seguros y Reaseguros Vtas
+5.2.1.1.26;                Movilización y Transporte Vtas.;Gastos Transporte Vtas
+5.2.1.1.27;                Guías de Transportes Vtas.;Gastos Transporte Vtas
+5.2.1.1.28;                Fletes Vtas.;Gastos Transporte Vtas
+5.2.1.1.29;                Gastos de Gestión Vtas.;Gastos de Gestión Vtas
+5.2.1.1.30;                Viajes Vtas.;Gastos de Viajes Vtas
+5.2.1.1.31;                Viajes al Exterior Vtas.;Gastos de Viajes Vtas
+5.2.1.1.32;                Pasajes Aereos Vtas.;Gastos de Viajes Vtas
+5.2.1.1.33;                Energía Eléctrica Vtas.;Agua, Energia, Luz y Telecomunicaciones Vtas
+5.2.1.1.34;                Teléfonos Convencionales Vtas.;Agua, Energia, Luz y Telecomunicaciones Vtas
+5.2.1.1.35;                Celulares Vtas.;Agua, Energia, Luz y Telecomunicaciones Vtas
+5.2.1.1.36;                Internet Vtas.;Agua, Energia, Luz y Telecomunicaciones Vtas
+5.2.1.1.37;                Agua Vtas.;Agua, Energia, Luz y Telecomunicaciones Vtas
+5.2.1.1.38;                Televisión Pagada Vtas. ;Agua, Energia, Luz y Telecomunicaciones Vtas
+5.2.1.1.39;                Gastos Notariales Vtas.;Gastos Notarios y Registradores de la Propiedad Vtas
+5.2.1.1.40;                Gastos de Registro Mercantil Vtas.;Gastos Notarios y Registradores de la Propiedad Vtas
+5.2.1.1.41;                Impuesto a los Consumos Especiales Vtas. ;Gastos Impuestos, Contribuciones y Otros Vtas
+5.2.1.1.42;                Impuesto a Consumos Vtas. ;Gastos Impuestos, Contribuciones y Otros Vtas
+5.2.1.1.43;                Tasas y Contribuciones Vtas. ;Gastos Impuestos, Contribuciones y Otros Vtas
+5.2.1.1.44;                Contribuciones a Superintendencia de Compañías Vtas.;Gastos Impuestos, Contribuciones y Otros Vtas
+5.2.1.1.45;                IVA Gasto Vtas.;Gastos Impuestos, Contribuciones y Otros Vtas
+5.2.1.1.46;                Depreciaciones Propiedades Planta y Equipos Vtas.;Gastos Impuestos, Contribuciones y Otros Vtas
+5.2.1.1.47;                Depreciaciones de Inversiones Vtas.;Gastos por Depreciación Propiedades de Inversión Vtas
+5.2.1.1.48;                Amortizaciones Intangibles Vtas.;Gastos por Amortizaciones Intangibles Vtas
+5.2.1.1.49;                Amortizaciones Otros Activos Vtas.;Gastos por Amortizaciones Otros Activos Vtas
+5.2.1.1.50;                Gastos por Deterioro Propiedades Planta y Equipos Vtas;Gastos por Deterioro Propiedades, Plantas y Equipos Vtas
+5.2.1.1.51;                Gastos de Deterioro Inventario Vtas;Gastos por Deterioro Inventario Vtas
+5.2.1.1.52;                Gastos por Deterioro Instrumentos Financieros Vtas;Gastos por Deterioro Instrumentos Financieros Vtas
+5.2.1.1.53;                Gastos por Deterioro Intangibles Vtas.;Gastos por Deterioro Intangibles Vtas
+5.2.1.1.54;                Gastos por Deterioro Cuentas por Cobrar Vtas;Gastos por Deterioro Cuentas por Cobrar Vtas
+5.2.1.1.55;                Gastos por Deterioro Otros Activos Vtas.;Gastos por Deterioro Otros Activos Vtas
+5.2.1.1.56;                Gastos Anormales Mano de Obra Vtas.;Gastos Anormales Mano de Obra Vtas
+5.2.1.1.57;                Gastos Anormales Materiales Vtas.;Gastos Anormales Materiales Vtas
+5.2.1.1.58;                Gastos Anormales Costos de Produccion Vtas;Gastos Anormales Costos de Producción Vtas
+5.2.1.1.59;                Gastos por Restructuracion Vtas;Gastos por Reestructuracion Vtas
+5.2.1.1.60;                Gastos por Valor Neto de realizacion de Inventarios Vtas;Gastos por Valor Neto de realizacion Inventario Vtas
+5.2.1.1.61;                Asociaciones y Suscripciones Vtas.;Otros Gastos Vtas
+5.2.1.1.62;                Cuotas y Afiliaciones Vtas.;Otros Gastos Vtas
+5.2.1.1.63;                Gastos de Oficina Vtas;Otros Gastos Vtas
+5.2.1.1.64;                Capacitación y Entrenamiento Vtas.;Otros Gastos Vtas
+5.2.1.1.65;                Uniformes Vtas.;Otros Gastos Vtas
+5.2.1.1.66;                Miscelaneos Vtas.;Otros Gastos Vtas
+5.2.1.2;            Administrativos;
+5.2.1.2.1;                Sueldos Unificados Adm.;Sueldos, Salarios y demás Remuneraciones Adm.
+5.2.1.2.2;                Sobretiempos Adm.;Sueldos, Salarios y demás Remuneraciones Adm.
+5.2.1.2.3;                Gratificaciones Adm.;Sueldos, Salarios y demás Remuneraciones Adm.
+5.2.1.2.4;                Alimentación Adm.;Sueldos, Salarios y demás Remuneraciones Adm.
+5.2.1.2.5;                Aportes Patronales al IESS Adm.;Aportes a la Seguridad Social Adm.
+5.2.1.2.6;                Secap - Iece Adm.;Aportes a la Seguridad Social Adm.
+5.2.1.2.7;                Fondos de Reserva Adm.;Aportes a la Seguridad Social Adm.
+5.2.1.2.8;                Décimo Tercer Sueldo Adm.;Beneficios Sociales e Indemnizaciones Adm
+5.2.1.2.9;                Décimo Cuarto Sueldo Adm.;Beneficios Sociales e Indemnizaciones Adm
+5.2.1.2.10;                Vacaciones Adm.;Beneficios Sociales e Indemnizaciones Adm
+5.2.1.2.11;                Desahucio Adm.;Beneficios Sociales e Indemnizaciones Adm
+5.2.1.2.12;                Gastos Planes de Beneficios a Empleados Adm.;Gastos Planes de Beneficios a Empleados Adm
+5.2.1.2.13;                Honorarios Profesionales Contabilidad Adm.;Gastos Honorarios, Comisiones y Dietas a PN Adm
+5.2.1.2.14;                Servicios Contratados Adm.;Gastos Honorarios, Comisiones y Dietas a PN Adm
+5.2.1.2.14.1;                    Firma Electrónica;Gastos Honorarios, Comisiones y Dietas a PN Adm
+5.2.1.2.14.2;                    Sistema contable-contífico;Gastos Honorarios, Comisiones y Dietas a PN Adm
+5.2.1.2.14.3;                    Servicios Administrativos;Gastos Honorarios, Comisiones y Dietas a PN Adm
+5.2.1.2.14.4;                    Datafast;Gastos Honorarios, Comisiones y Dietas a PN Adm
+5.2.1.2.15;                Gastos Remuneraciones a otros trabajadores autónomos Adm.;Gastos Remuneraciones a otros trabajadores autónomos Adm
+5.2.1.2.16;                Gastos Honorarios a extranjeros por Servicios Ocasionales Adm.;Gastos Honorarios a extranjeros por Servicios Ocasionales Adm
+5.2.1.2.17;                Mantenimiento de Vehículos;Gastos de Mantenimiento, Repuestos y Reparaciones Adm
+5.2.1.2.17.1;                    Mantenimiento de vehículos;Gastos de Mantenimiento, Repuestos y Reparaciones Adm
+5.2.1.2.18;                Reparaciones de Equipos Adm.;Gastos de Mantenimiento, Repuestos y Reparaciones Adm
+5.2.1.2.19;                Arriendos Adm.;Gastos Arrendamiento Operativo Adm
+5.2.1.2.20;                Comisiones Adm.;Comisiones Adm
+5.2.1.2.21;                Publicidad y Promoción Adm.;Gastos Promoción y Publicidad Adm.
+5.2.1.2.22;                Publicaciones y Agencias Adm.;Gastos Promoción y Publicidad Adm.
+5.2.1.2.23;                Combustible Adm.;Gastos Combustibles Adm
+5.2.1.2.24;                Lubricantes Adm.;Gastos Combustibles Adm
+5.2.1.2.25;                Seguros Adm.;Gastos Seguros y Reaseguros Adm
+5.2.1.2.26;                Movilización y Transporte Adm.;Gastos Transporte Adm
+5.2.1.2.27;                Guías de Transportes Adm.;Gastos Transporte Adm
+5.2.1.2.28;                Fletes Adm.;Gastos Transporte Adm
+5.2.1.2.29;                Gastos de Gestión Adm.;Gastos de Gestión Adm
+5.2.1.2.30;                Gastos de Viajes Adm.;Gastos de Viajes Adm
+5.2.1.2.31;                Viajes al Exterior Adm.;Gastos de Viajes Adm
+5.2.1.2.32;                Pasajes Aereos Adm.;Gastos de Viajes Adm
+5.2.1.2.33;                Energía Eléctrica Adm.;Agua, Energia, Luz y Telecomunicaciones Adm
+5.2.1.2.34;                Teléfonos Convencionales Adm.;Agua, Energia, Luz y Telecomunicaciones Adm
+5.2.1.2.35;                Celulares Adm.;Agua, Energia, Luz y Telecomunicaciones Adm
+5.2.1.2.36;                Internet Adm.;Agua, Energia, Luz y Telecomunicaciones Adm
+5.2.1.2.37;                Agua Adm.;Agua, Energia, Luz y Telecomunicaciones Adm
+5.2.1.2.38;                Seguridad Adm.;Agua, Energia, Luz y Telecomunicaciones Adm
+5.2.1.2.39;                Gastos Notariales Adm.;Gastos Notarios y Registradores de la Propiedad Adm
+5.2.1.2.40;                Gastos de Registro Mercantil Adm.;Gastos Notarios y Registradores de la Propiedad Adm
+5.2.1.2.41;                Impuesto a los Consumos Especiales Adm.;Gastos Impuestos, Contribuciones y Otros Adm
+5.2.1.2.42;                Patente y el 1.5 por mil;Gastos Impuestos, Contribuciones y Otros Adm
+5.2.1.2.43;                Tasas y Contribuciones Adm.;Gastos Impuestos, Contribuciones y Otros Adm
+5.2.1.2.44;                Contribuciones a Superintendencia de Compañías Adm.;Gastos Impuestos, Contribuciones y Otros Adm
+5.2.1.2.45;                IVA Gasto Adm.;Gastos Impuestos, Contribuciones y Otros Adm
+5.2.1.2.46;                Depreciaciones Propiedades Planta y Equipos Adm.;Gastos Impuestos, Contribuciones y Otros Adm
+5.2.1.2.47;                Depreciaciones de Inversiones Adm.;Gastos por Depreciación Propiedades de Inversión Adm
+5.2.1.2.48;                Amortizaciones Intangibles Adm.;Gastos por Amortizaciones Intangibles Adm
+5.2.1.2.49;                Amortizaciones Otros Activos Adm.;Gastos por Amortizaciones Otros Activos Adm
+5.2.1.2.50;                Gastos por Deterioro Propiedades Planta y Equipos Adm.;Gastos por Deterioro Propiedades, Plantas y Equipos Adm
+5.2.1.2.51;                Gastos de Deterioro Inventario Adm.;Gastos por Deterioro Inventario Adm
+5.2.1.2.52;                Gastos por Deterioro Instrumentos Financieros Adm.;Gastos por Deterioro Instrumentos Financieros Adm
+5.2.1.2.53;                Gastos por Deterioro Instrumentos Financieros Adm.;Gastos por Deterioro Instrumentos Financieros Adm
+5.2.1.2.54;                Gastos por Deterioro Cuentas por Cobrar Adm.;Gastos por Deterioro Cuentas por Cobrar Adm
+5.2.1.2.55;                Gastos por Deterioro Otros Activos Adm.;Gastos por Deterioro Otros Activos Adm
+5.2.1.2.56;                Gastos Anormales Mano de Obra Adm.;Gastos Anormales Mano de Obra Adm
+5.2.1.2.57;                Gastos Anormales Materiales Adm.;Gastos Anormales Materiales Adm
+5.2.1.2.58;                Gastos Anormales Costos de Producción Adm.;Gastos Anormales Costos de Producción Adm
+5.2.1.2.59;                Gastos por Restructuracion y Adecuaciones Adm.;Gastos por Reestructuracion Adm
+5.2.1.2.60;                Gastos por Valor Neto de realizacion de Inventarios Adm.;Gastos por Valor Neto de realizacion Inventario Adm
+5.2.1.2.61;                Hosting web;Otros Gastos Adm
+5.2.1.2.62;                Cuotas y Afiliaciones Adm.;Otros Gastos Adm
+5.2.1.2.63;                Gastos de Oficina Adm.;Otros Gastos Adm
+5.2.1.2.64;                Capacitación y Entrenamiento Adm.;Otros Gastos Adm
+5.2.1.2.65;                Gastos útiles de aseo;Otros Gastos Adm
+5.2.1.2.66;                Miscelaneos Adm.;Otros Gastos Adm
+5.2.1.2.67;                Gasto Equipos de computo KG;(-) Depreciación Acumulada Propiedades, Planta  y Equipo 
+5.2.1.3;            Gastos Financieros;
+5.2.1.3.1;                Intereses;Gastos Intereses
+5.2.1.3.2;                Comisiones Bancarias;Gastos Comisiones
+5.2.1.3.3;                Comisiones tarjetas;Gastos Comisiones
+5.2.1.3.4;                Gastos Diferencia en Cambio;Gastos Diferencia en Cambio
+5.2.1.3.5;                Otros Gastos Financieros;Otros Gastos Financieros
+5.2.2;        Gastos No Operacionales;
+5.2.2.1;            Otros Gastos;
+5.2.2.1.1;                Gasto Impuesto a la Renta;Impuesto a la Renta por Pagar
+5.2.2.1.2;                Intereses Tributarios;Otros Gastos No Deducibles
+5.2.2.1.3;                Multas Tributarias ;Otros Gastos No Deducibles
+5.2.2.1.4;                Multas Superintendencia de Compañías ;Otros Gastos No Deducibles
+5.2.2.1.5;                Faltantes de Inventario;Otros Gastos No Deducibles
+5.2.2.1.6;                Faltantes de Caja;Otros Gastos No Deducibles
+5.2.2.1.7;                Comprobantes de Ventas que no cumplen requisitos legales;Otros Gastos No Deducibles
+5.2.2.1.8;                Gastos de Viajes;Otros Gastos No Deducibles
+5.2.2.1.9;                Gastos de Gestión;Otros Gastos No Deducibles
+5.2.2.1.10;                Retenciones Asumidas;Otros Gastos No Deducibles
+5.2.2.1.11;                Gastos por Cancelación de Propinas;Otros Gastos No Deducibles
+5.2.3;        Gastos de Operaciones Descontinuadas;
+5.2.3.1;            Gastos de Operaciones Descontinuadas;Gastos de Operaciones Descontinuadas

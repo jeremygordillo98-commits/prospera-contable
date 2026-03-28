@@ -207,22 +207,30 @@ export const Entidades = ({ empresaId }: { empresaId: string }) => {
                       </tbody>
                     </table>
 
-                    <div className="mobile-card-list">
+                    <div className="mobile-card-list" style={{ borderTop: '1px solid var(--border-color)' }}>
                       {entidadesGrupo.map(e => (
-                        <div key={e.id} className="entity-card" style={{ padding: '16px', borderBottom: '1px solid var(--border-color)' }}>
-                          <div className="flex-between" style={{ marginBottom: '8px' }}>
-                            <div style={{ fontWeight: 700 }}>{e.nombre || e.razon_social}</div>
-                            <span style={{ fontSize: '0.7rem', opacity: 0.7 }}>{e.persona_tipo}</span>
+                        <div key={e.id} className="entity-card">
+                          <div className="flex-between" style={{ marginBottom: '4px' }}>
+                            <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text-main)' }}>{e.nombre || e.razon_social}</div>
+                            <span style={{ 
+                              fontSize: '0.65rem', 
+                              background: 'var(--primary-light)', 
+                              color: 'var(--primary)', 
+                              padding: '2px 8px', 
+                              borderRadius: '6px',
+                              fontWeight: 700,
+                              textTransform: 'uppercase'
+                            }}>{e.persona_tipo}</span>
                           </div>
-                          <div className="text-sec" style={{ fontSize: '0.8rem', marginBottom: '8px' }}>{e.ruc_cedula}</div>
-                          <div className="flex-between">
-                            <div className="flex gap-8">
-                               {e.email && <Mail size={14} className="text-sec" />}
-                               {e.telefono && <Phone size={14} className="text-sec" />}
-                            </div>
+                          <div className="text-sec" style={{ fontSize: '0.8rem', marginBottom: '12px', fontWeight: 600 }}>{e.ruc_cedula}</div>
+                          <div className="flex-between" style={{ alignItems: 'center' }}>
                             <div style={{ display: 'flex', gap: '12px' }}>
-                               <button style={btnActionStyle} onClick={() => handleOpenModal(e)}><Edit2 size={16} /></button>
-                               <button style={{ ...btnActionStyle, color: 'var(--error)' }} onClick={() => handleDelete(e.id, e.razon_social)}><Trash2 size={16} /></button>
+                               {e.email && <Mail size={16} className="text-sec" style={{ opacity: 0.6 }} />}
+                               {e.telefono && <Phone size={16} className="text-sec" style={{ opacity: 0.6 }} />}
+                            </div>
+                            <div style={{ display: 'flex', gap: '16px' }}>
+                               <button style={btnActionStyle} onClick={() => handleOpenModal(e)}><Edit2 size={18} /></button>
+                               <button style={{ ...btnActionStyle, color: 'var(--error)' }} onClick={() => handleDelete(e.id, e.razon_social)}><Trash2 size={18} /></button>
                             </div>
                           </div>
                         </div>

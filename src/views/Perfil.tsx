@@ -25,7 +25,7 @@ export const Perfil = () => {
             const { data: dbProfile } = await supabase
                 .from('perfiles')
                 .select('*')
-                .eq('id', user.id)
+                .eq('id_usuario', user.id)
                 .single();
 
             setUserData({
@@ -53,7 +53,7 @@ export const Perfil = () => {
             
             // 2. Actualizar o Insertar en tabla perfiles (upsert)
             const { error: dbError } = await supabase.from('perfiles').upsert({
-                id: user.id,
+                id_usuario: user.id,
                 nombre_completo: userData.nombre_completo,
                 email: userData.email,
                 ruc_profesional: userData.ruc_profesional

@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, Users, PlusCircle, Upload, Loader2, PieChart, ArrowUpRight, ArrowDownRight, LayoutDashboard, Wallet, CreditCard } from 'lucide-react';
+import { TrendingUp, Users, PlusCircle, Loader2, PieChart, ArrowUpRight, ArrowDownRight, LayoutDashboard, Wallet, CreditCard } from 'lucide-react';
 import { supabase } from '../services/supabase';
 
-interface DashboardProps {
+interface DashboardViewProps {
     empresaId: string;
-    onUploadClick: () => void;
 }
 
-export const DashboardView: React.FC<DashboardProps> = ({ empresaId, onUploadClick }) => {
+export const DashboardView: React.FC<DashboardViewProps> = ({ empresaId }) => {
     const [stats, setStats] = useState({
         balance: 0,
         cxc: 0,
@@ -86,12 +85,8 @@ export const DashboardView: React.FC<DashboardProps> = ({ empresaId, onUploadCli
                     <button className="btn btn-primary" onClick={() => alert("Módulo de asientos en construcción")}>
                         <PlusCircle size={20} /> <span className="hide-mobile">Nuevo Asiento</span>
                     </button>
-                    <button
-                        onClick={onUploadClick}
-                        className="btn glass-card"
-                        style={{ border: '1px solid var(--border-color)' }}
-                    >
-                        <Upload size={20} /> <span className="hide-mobile">Cargar XML</span>
+                    <button className="btn glass-card" style={{ border: '1px solid var(--border-color)', opacity: 0.5 }}>
+                         <LayoutDashboard size={18} /> <span className="hide-mobile">Personalizar Gráficos</span>
                     </button>
                 </div>
             </header>

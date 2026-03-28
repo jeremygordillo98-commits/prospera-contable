@@ -1,21 +1,15 @@
 import { useState, useEffect } from 'react';
 import { 
   LayoutDashboard, 
-  Users, 
-  FileText, 
-  BookOpen, 
-  Settings, 
-  ChevronRight,
-  Grid,
   LogOut,
   Loader2,
   Building2,
-  Plus,
   MoreHorizontal,
-  User
+  Settings
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from './services/supabase';
+import { MENU_STRUCTURE } from './constants/menu';
 import type { Session } from '@supabase/supabase-js';
 
 // Views
@@ -26,8 +20,10 @@ import { Login } from './views/Login';
 import { Asientos } from './views/Asientos';
 import { Reportes } from './views/Reportes';
 import { Perfil } from './views/Perfil';
-import { XMLUploadModal } from './components/XMLUploadModal';
 import { DashboardView } from './views/Dashboard';
+import { Sidebar } from './components/Sidebar';
+import { SRIAutomation } from './views/SRIAutomation';
+import { LibroDiario } from './views/LibroDiario';
 
 interface Empresa {
   id: string;
@@ -35,12 +31,9 @@ interface Empresa {
   ruc_empresa: string;
 }
 
-
-
 const App = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [activeView, setActiveView] = useState('dashboard');
-  const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   
   // Multitenancy states
@@ -49,7 +42,7 @@ const App = () => {
   const [loadingEmpresas, setLoadingEmpresas] = useState(true);
   const [showNewEmpresaModal, setShowNewEmpresaModal] = useState(false);
   const [newEmpresaName, setNewEmpresaName] = useState('');
-  const [limiteEmpresas, setLimiteEmpresas] = useState<number>(2); // Default fallback
+  const [limiteEmpresas, setLimiteEmpresas] = useState<number>(2);
   const [showLimitModal, setShowLimitModal] = useState(false);
 
   useEffect(() => {
@@ -77,7 +70,7 @@ const App = () => {
     const { data, error } = await supabase
       .from('perfiles')
       .select('limite_empresas')
-      .eq('id', session?.user.id)
+      .eq('id_usuario', session?.user.id)
       .single();
     
     if (!error && data) {
@@ -104,7 +97,6 @@ const App = () => {
   const createEmpresa = async () => {
     if (!newEmpresaName || !session?.user?.id) return;
 
-    // VALIDACIÓN DE LÍMITE
     if (empresas.length >= limiteEmpresas) {
         setShowNewEmpresaModal(false);
         setShowLimitModal(true);
@@ -115,7 +107,7 @@ const App = () => {
       .from('empresas_gestionadas')
       .insert({ 
         nombre_empresa: newEmpresaName,
-        ruc_empresa: `TEMP-${Date.now()}`, // RUC temporal si solo queremos nombre
+        ruc_empresa: `TEMP-${Date.now()}`,
         id_usuario: session.user.id,
         moneda: 'USD'
       })
@@ -129,18 +121,8 @@ const App = () => {
       setNewEmpresaName('');
     } else {
       console.error("Supabase Error:", error);
-      alert(`Error al crear la empresa: ${error?.message || 'Error desconocido'}`);
     }
   };
-
-  const navItems = [
-    { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { id: 'entidades', icon: Users, label: 'Terceros (CXC/CXP)' },
-    { id: 'plan-cuentas', icon: BookOpen, label: 'Plan de Cuentas' },
-    { id: 'asientos', icon: Grid, label: 'Asientos Contables' },
-    { id: 'reportes', icon: FileText, label: 'Reportes (Balances)' },
-    { id: 'config', icon: Settings, label: 'Configuración' },
-  ];
 
   const renderContent = () => {
     if (!selectedEmpresa) {
@@ -148,10 +130,7 @@ const App = () => {
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60vh', textAlign: 'center' }}>
                 <Building2 size={64} className="text-sec" style={{ marginBottom: '24px', opacity: 0.3 }} />
                 <h2 className="h1">Crea tu primera empresa</h2>
-                <p className="text-sec" style={{ maxWidth: '400px', margin: '16px 0 24px' }}>
-                    Para comenzar a llevar la contabilidad, necesitas registrar al menos un cliente o empresa.
-                </p>
-                <div style={{ display: 'flex', gap: '12px' }}>
+                <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
                     <input 
                         type="text" 
                         placeholder="Nombre de la empresa" 
@@ -166,7 +145,11 @@ const App = () => {
     }
 
     switch (activeView) {
-      case 'dashboard': return <DashboardView empresaId={selectedEmpresa.id} onUploadClick={() => setIsUploadOpen(true)} />;
+      case 'dashboard': return <DashboardView empresaId={selectedEmpresa.id} />;
+      case 'xml-compras':
+      case 'xml-ventas':
+        return <SRIAutomation tipo={activeView === 'xml-compras' ? 'Compras' : 'Ventas'} empresaId={selectedEmpresa.id} />;
+      case 'libro-diario': return <LibroDiario empresaId={selectedEmpresa.id} />;
       case 'entidades': return <Entidades empresaId={selectedEmpresa.id} />;
       case 'plan-cuentas': return <PlanCuentas empresaId={selectedEmpresa.id} />;
       case 'asientos': return <Asientos />;
@@ -208,80 +191,15 @@ const App = () => {
         <div className="orb orb-2"></div>
       </div>
 
-      <aside className="sidebar">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '32px', paddingLeft: '8px' }}>
-          <div style={{ width: 32, height: 32, background: 'var(--primary)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800 }}>P</div>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.5px' }}>Prospera <span style={{ color: 'var(--primary)' }}>Contable</span></h2>
-        </div>
-
-        {/* SELECTOR DE EMPRESA */}
-        <div style={{ marginBottom: '24px', padding: '0 8px' }}>
-            <label style={{ fontSize: '0.7rem', color: 'var(--text-sec)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px', display: 'block' }}>Cliente Seleccionado</label>
-            <div className="glass-card" style={{ padding: '4px', border: '1px solid var(--border-color)', borderRadius: '12px' }}>
-                <select 
-                    value={selectedEmpresa?.id || ''} 
-                    onChange={(e) => setSelectedEmpresa(empresas.find(emp => emp.id === e.target.value) || null)}
-                    style={{ width: '100%', background: 'transparent', border: 'none', color: 'var(--text-main)', padding: '8px', fontSize: '0.9rem', outline: 'none' }}
-                >
-                    {empresas.map(emp => (
-                        <option key={emp.id} value={emp.id} style={{ background: 'var(--bg-color)' }}>{emp.nombre_empresa}</option>
-                    ))}
-                </select>
-                <button 
-                  onClick={() => setShowNewEmpresaModal(true)}
-                  style={{ width: '100%', padding: '8px', background: 'rgba(255,255,255,0.03)', border: 'none', borderRadius: '8px', color: 'var(--primary)', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
-                >
-                    <Plus size={14} /> Nuevo Cliente
-                </button>
-            </div>
-        </div>
-
-        <nav style={{ flex: 1 }}>
-          {navItems.map(item => (
-            <button
-              key={item.id}
-              onClick={() => setActiveView(item.id)}
-              className="btn"
-              style={{
-                width: '100%',
-                justifyContent: 'flex-start',
-                background: activeView === item.id ? 'var(--primary-light)' : 'transparent',
-                color: activeView === item.id ? 'var(--primary)' : 'var(--text-sec)',
-                padding: '12px 16px',
-                marginBottom: '4px',
-                border: activeView === item.id ? '1px solid rgba(99, 102, 241, 0.2)' : 'none',
-              }}
-            >
-              <item.icon size={20} />
-              <span>{item.label}</span>
-              {activeView === item.id && <ChevronRight size={16} style={{ marginLeft: 'auto' }} />}
-            </button>
-          ))}
-        </nav>
-
-        <div className="glass-card" style={{ padding: '16px', marginTop: 'auto', borderRadius: '12px' }}>
-          <div className="flex-between">
-            <button
-                onClick={() => setActiveView('perfil')}
-                style={{ background: 'transparent', border: 'none', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', textAlign: 'left', flex: 1 }}
-            >
-                <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), #C026D3)', display: 'flex', alignItems: 'center', justifyItems: 'center', color: '#fff', fontWeight: 800 }}></div>
-                <div style={{ overflow: 'hidden' }}>
-                    <div style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-main)', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100px' }}>{session.user.user_metadata?.nombre_completo || session.user.email?.split('@')[0]}</div>
-                    <div className="text-sec" style={{ fontSize: '0.7rem' }}>Mi Perfil</div>
-                </div>
-            </button>
-            <button 
-                onClick={() => supabase.auth.signOut()}
-                className="btn flex-center" 
-                style={{ width: '36px', height: '36px', padding: 0, borderRadius: '10px', color: 'var(--error)', border: '1px solid rgba(239, 68, 68, 0.2)', background: 'transparent' }}
-                title="Cerrar Sesión"
-            >
-                <LogOut size={18} />
-            </button>
-          </div>
-        </div>
-      </aside>
+      <Sidebar 
+        activeView={activeView}
+        setActiveView={setActiveView}
+        selectedEmpresa={selectedEmpresa}
+        setSelectedEmpresa={setSelectedEmpresa}
+        empresas={empresas}
+        setShowNewEmpresaModal={setShowNewEmpresaModal}
+        session={session}
+      />
 
       <main className="main-content">
         <AnimatePresence mode="wait">
@@ -292,71 +210,86 @@ const App = () => {
       </main>
 
       <nav className="mobile-nav">
-        {[
-          { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-          { id: 'entidades', icon: Users, label: 'Terceros' },
-          { id: 'asientos', icon: Grid, label: 'Asientos' },
-        ].map(item => (
-          <button
-            key={item.id}
-            onClick={() => {
-              setActiveView(item.id);
-              setIsMoreMenuOpen(false);
-            }}
-            className={`nav-item-mobile ${activeView === item.id && !isMoreMenuOpen ? 'active' : ''}`}
-          >
-            <item.icon size={24} />
-            <span>{item.label}</span>
-          </button>
-        ))}
+        <button
+          onClick={() => {
+            setActiveView('dashboard');
+            setIsMoreMenuOpen(false);
+          }}
+          className={`nav-item-mobile ${activeView === 'dashboard' && !isMoreMenuOpen ? 'active' : ''}`}
+        >
+          <LayoutDashboard size={24} />
+          <span>Inicio</span>
+        </button>
+
         <button
           onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}
           className={`nav-item-mobile ${isMoreMenuOpen ? 'active' : ''}`}
         >
-          <MoreHorizontal size={24} />
-          <span>Más</span>
+          <div style={{ 
+            background: isMoreMenuOpen ? 'var(--primary)' : 'var(--primary-light)', 
+            color: isMoreMenuOpen ? '#fff' : 'var(--primary)',
+            padding: '10px',
+            borderRadius: '16px',
+            display: 'flex'
+          }}>
+            <MoreHorizontal size={24} />
+          </div>
+          <span style={{ fontWeight: 800 }}>Más</span>
+        </button>
+
+        <button
+          onClick={() => {
+            setActiveView('config');
+            setIsMoreMenuOpen(false);
+          }}
+          className={`nav-item-mobile ${activeView === 'config' && !isMoreMenuOpen ? 'active' : ''}`}
+        >
+          <Settings size={24} />
+          <span>Config</span>
         </button>
       </nav>
 
       <AnimatePresence>
         {isMoreMenuOpen && (
           <motion.div 
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 100 }}
-            className="more-menu-overlay"
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.95 }}
+            className="more-menu-overlay custom-scrollbar"
           >
-            {[
-              { id: 'plan-cuentas', icon: BookOpen, label: 'Cuentas' },
-              { id: 'reportes', icon: FileText, label: 'Reportes' },
-              { id: 'config', icon: Settings, label: 'Config' },
-              { id: 'perfil', icon: User, label: 'Perfil' },
-            ].map(item => (
-              <button
-                key={item.id}
-                className="more-menu-item"
-                onClick={() => {
-                  setActiveView(item.id);
-                  setIsMoreMenuOpen(false);
-                }}
-              >
-                <item.icon size={22} />
-                <span>{item.label}</span>
-              </button>
+            {MENU_STRUCTURE.filter(item => item.id !== 'dashboard').map(group => (
+              <div key={group.id} className="more-menu-group">
+                <div className="more-menu-parent-label">
+                   <group.icon size={14} /> {group.label}
+                </div>
+                {group.children?.map(item => (
+                  <button
+                    key={item.id}
+                    className={`more-menu-item ${activeView === item.id ? 'active' : ''}`}
+                    onClick={() => {
+                      setActiveView(item.id);
+                      setIsMoreMenuOpen(false);
+                    }}
+                  >
+                    <item.icon size={20} />
+                    <span>{item.label}</span>
+                  </button>
+                ))}
+              </div>
             ))}
+            
             <button
                className="more-menu-item"
-               style={{ color: 'var(--error)' }}
+               style={{ color: 'var(--error)', marginTop: '8px', background: 'rgba(239, 68, 68, 0.05)', borderRadius: '18px' }}
                onClick={() => supabase.auth.signOut()}
             >
-              <LogOut size={22} />
-              <span>Salir</span>
+              <LogOut size={20} />
+              <span style={{ fontWeight: 800 }}>Cerrar Sesión</span>
             </button>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Modal Nueva Empresa */}
       <AnimatePresence>
         {showNewEmpresaModal && (
           <div className="modal-overlay" style={{ zIndex: 200 }}>
@@ -367,14 +300,13 @@ const App = () => {
               style={{ width: '90%', maxWidth: '400px', padding: '32px' }}
             >
                 <h3>Nuevo Cliente Contable</h3>
-                <p className="text-sec" style={{ margin: '12px 0 24px' }}>Ingresa el nombre de la empresa para separar su contabilidad.</p>
                 <input 
                     autoFocus
                     type="text" 
                     placeholder="Nombre de la empresa" 
                     value={newEmpresaName}
                     onChange={(e) => setNewEmpresaName(e.target.value)}
-                    style={{ width: '100%', padding: '12px', borderRadius: '10px', background: 'var(--input-bg)', border: '1px solid var(--border-color)', color: 'var(--text-main)', marginBottom: '24px' }}
+                    style={{ width: '100%', padding: '12px', borderRadius: '10px', background: 'var(--input-bg)', border: '1px solid var(--border-color)', color: 'var(--text-main)', marginBottom: '24px', marginTop: '24px' }}
                 />
                 <div style={{ display: 'flex', gap: '12px' }}>
                     <button className="btn flex-1" onClick={() => setShowNewEmpresaModal(false)}>Cancelar</button>
@@ -385,7 +317,6 @@ const App = () => {
         )}
       </AnimatePresence>
 
-      {/* Modal Límite Alcanzado */}
       <AnimatePresence>
         {showLimitModal && (
           <div className="modal-overlay" style={{ zIndex: 300 }}>
@@ -398,34 +329,15 @@ const App = () => {
                 <div style={{ width: 64, height: 64, background: 'rgba(239, 68, 68, 0.1)', color: 'var(--error)', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
                     <Building2 size={32} />
                 </div>
-                <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '16px' }}>Límite de Clientes Alcanzado</h3>
-                <p className="text-sec" style={{ marginBottom: '32px', lineHeight: '1.6' }}>
-                    Tu plan actual permite gestionar hasta <strong>{limiteEmpresas} empresas</strong>. 
-                    Para ampliar tu capacidad y gestionar más clientes, por favor contáctanos.
-                </p>
-                
-                <div className="glass-card" style={{ padding: '20px', background: 'rgba(99, 102, 241, 0.05)', marginBottom: '24px', border: '1px dashed var(--primary)' }}>
-                    <div style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--primary)', fontWeight: 700, marginBottom: '8px' }}>Soporte Comercial</div>
-                    <div style={{ fontWeight: 600, fontSize: '1rem' }}>prospera.app.soporte@gmail.com</div>
-                </div>
-
+                <h3>Límite Alcanzado</h3>
+                <p className="text-sec" style={{ marginBottom: '32px' }}>Contacta a soporte para ampliar el límite.</p>
                 <button className="btn btn-primary w-full" onClick={() => setShowLimitModal(false)}>Entendido</button>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
-
-      <XMLUploadModal 
-        isOpen={isUploadOpen} 
-        empresaId={selectedEmpresa?.id || ''}
-        onClose={() => setIsUploadOpen(false)} 
-        onSuccess={() => {
-           console.log("Upload Success!");
-        }} 
-      />
     </div>
   );
 };
 
 export default App;
-// Clean App.tsx

@@ -195,29 +195,31 @@ export const PlanCuentas = ({ empresaId }: { empresaId: string }) => {
               <div className="mobile-card-list">
                 {filtered.map(c => (
                   <div key={c.id} className="entity-card">
-                    <div className="flex-between" style={{ marginBottom: '8px' }}>
-                      <div style={{ fontWeight: 800, color: 'var(--primary)' }}>{c.codigo_cuenta}</div>
+                    <div className="flex-between" style={{ marginBottom: '4px' }}>
+                      <span style={{ fontWeight: 800, color: 'var(--primary)', letterSpacing: '0.05em', fontSize: '0.9rem' }}>{c.codigo_cuenta}</span>
                       <span style={{ 
-                        fontSize: '0.7rem', 
+                        fontSize: '0.65rem', 
                         background: 'var(--primary-light)', 
                         color: 'var(--primary)', 
-                        padding: '2px 6px', 
-                        borderRadius: '4px' 
+                        padding: '2px 8px', 
+                        borderRadius: '6px',
+                        fontWeight: 700,
+                        textTransform: 'uppercase'
                       }}>
                         {c.tipo}
                       </span>
                     </div>
-                    <div style={{ fontWeight: 600, marginBottom: '12px' }}>{c.nombre}</div>
-                    <div className="flex-between">
+                    <div style={{ fontWeight: 700, fontSize: '1rem', marginBottom: '12px', color: 'var(--text-main)' }}>{c.nombre}</div>
+                    <div className="flex-between" style={{ alignItems: 'center' }}>
                       <div style={{ fontSize: '0.75rem' }}>
                         {c.acepta_movimientos ? 
-                          <span style={{ color: 'var(--success)' }}>Acepta Mov.</span> : 
-                          <span style={{ opacity: 0.4 }}><Lock size={10} /> Solo Grupo</span>
+                          <span style={{ color: 'var(--success)', fontWeight: 600 }}>● Acepta Mov.</span> : 
+                          <span style={{ opacity: 0.5, display: 'flex', alignItems: 'center', gap: '4px' }}><Lock size={12} /> Solo Grupo</span>
                         }
                       </div>
-                      <div className="flex gap-8">
-                        <button style={btnActionStyle} onClick={() => handleOpenModal(c)}><Edit2 size={16} /></button>
-                        <button style={{ ...btnActionStyle, color: 'var(--error)' }} onClick={() => handleDelete(c.id, c.nombre)}><Trash2 size={16} /></button>
+                      <div style={{ display: 'flex', gap: '16px' }}>
+                        <button style={btnActionStyle} onClick={() => handleOpenModal(c)}><Edit2 size={18} /></button>
+                        <button style={{ ...btnActionStyle, color: 'var(--error)' }} onClick={() => handleDelete(c.id, c.nombre)}><Trash2 size={18} /></button>
                       </div>
                     </div>
                   </div>

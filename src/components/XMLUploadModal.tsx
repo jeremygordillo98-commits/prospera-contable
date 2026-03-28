@@ -6,14 +6,20 @@ import {
   CheckCircle2, 
   AlertCircle,
   Loader2,
-  Save,
-  Percent
+  Save
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-// Se eliminaron variables importadas sin uso, corrigiendo así errores de linter en líneas pasadas.
 import { type SRIInvoiceData, parseSRIXML } from '../utils/sriParser';
 import { supabase } from '../services/supabase';
 import { CATALOGO_RETENCIONES_RENTA } from '../utils/sriCatalog';
+import { EntidadQuickForm } from './EntidadQuickForm';
+
+interface Account {
+  id: string;
+  codigo_cuenta: string;
+  nombre: string;
+  tipo: string;
+}
 
 interface XMLUploadModalProps {
   isOpen: boolean;
@@ -27,13 +33,78 @@ export const XMLUploadModal: React.FC<XMLUploadModalProps> = ({ isOpen, empresaI
   const [parsing, setParsing] = useState(false);
   const [parsedData, setParsedData] = useState<SRIInvoiceData | null>(null);
   
+  // Estados para verificación de Entidad
+  const [verifyingEntidad, setVerifyingEntidad] = useState(false);
+  const [entidadId, setEntidadId] = useState<string | null>(null);
+  const [showCreateEntidad, setShowCreateEntidad] = useState(false);
+
   // Estado para concepto de retención IR
   const [retencionCodigo, setRetencionCodigo] = useState(CATALOGO_RETENCIONES_RENTA[0].codigo);
   
+  // Estados para Contabilidad (Asiento)
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [idCuentaGasto, setIdCuentaGasto] = useState<string>('');
+  const [idCuentaPago, setIdCuentaPago] = useState<string>('');
+
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   const retencionSeleccionada = CATALOGO_RETENCIONES_RENTA.find(r => r.codigo === retencionCodigo) || CATALOGO_RETENCIONES_RENTA[0];
+  const valorRetenido = parsedData ? parseFloat(((parsedData.baseImponible * retencionSeleccionada.porcentaje) / 100).toFixed(2)) : 0;
+
+  const fetchAccounts = async () => {
+    if (!empresaId) return;
+    try {
+      const { data } = await supabase
+        .from('plan_cuentas')
+        .select('id, codigo_cuenta, nombre, tipo')
+        .eq('id_empresa', empresaId)
+        .eq('acepta_movimientos', true)
+        .order('codigo_cuenta');
+
+      if (data) {
+        setAccounts(data);
+        // Sugerir defaults
+        const defaultGasto = data.find(a => a.codigo_cuenta.startsWith('5')) || data[0];
+        const defaultPago = data.find(a => a.codigo_cuenta.startsWith('2.1.3')) || data[0];
+        if (defaultGasto) setIdCuentaGasto(defaultGasto.id);
+        if (defaultPago) setIdCuentaPago(defaultPago.id);
+      }
+    } catch (err) {
+      console.error("Error fetching accounts:", err);
+    }
+  };
+
+  React.useEffect(() => {
+    if (isOpen && empresaId) {
+      fetchAccounts();
+    }
+  }, [isOpen, empresaId]);
+
+  const checkEntidadExistente = async (ruc: string) => {
+    setVerifyingEntidad(true);
+    setEntidadId(null);
+    setShowCreateEntidad(false);
+
+    try {
+      const { data } = await supabase
+        .from('entidades')
+        .select('id')
+        .eq('ruc_cedula', ruc)
+        .eq('id_empresa', empresaId)
+        .maybeSingle();
+
+      if (data) {
+        setEntidadId(data.id);
+      } else {
+        setShowCreateEntidad(true);
+      }
+    } catch {
+      console.error("Error checking entity");
+    } finally {
+      setVerifyingEntidad(false);
+    }
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -49,6 +120,7 @@ export const XMLUploadModal: React.FC<XMLUploadModalProps> = ({ isOpen, empresaI
       const data = await parseSRIXML(text);
       if (data) {
         setParsedData(data);
+        await checkEntidadExistente(data.rucEmisor);
       } else {
         setStatus('error');
       }
@@ -57,79 +129,93 @@ export const XMLUploadModal: React.FC<XMLUploadModalProps> = ({ isOpen, empresaI
       setStatus('error');
     } finally {
       setParsing(false);
+      // Reset input para permitir subir el mismo archivo si se desea
+      e.target.value = '';
     }
   };
 
   const handleSave = async () => {
-    if (!parsedData || !empresaId) return;
+    if (!parsedData || !empresaId || !entidadId || !idCuentaGasto || !idCuentaPago) {
+      alert("Por favor asegúrate de seleccionar todas las cuentas contables.");
+      return;
+    }
     setSaving(true);
 
     try {
-      // 1. Verificar o crear la entidad (Proveedor) vinculada a esta empresa
-      let { data: entidad, error: eError } = await supabase
-        .from('entidades')
-        .select('id')
-        .eq('ruc_cedula', parsedData.rucEmisor)
-        .eq('id_empresa', empresaId)
-        .single();
-      
-      if (eError || !entidad) {
-        const { data: newEntidad, error: nError } = await supabase
-          .from('entidades')
-          .insert({
-            ruc_cedula: parsedData.rucEmisor,
-            razon_social: parsedData.razonSocialEmisor,
-            tipo_entidad: 'Proveedor',
-            id_empresa: empresaId
-          })
-          .select()
-          .single();
-        
-        if (nError) throw nError;
-        entidad = newEntidad;
-      }
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Sesión no válida");
 
-      // 2. Crear la transacción cabecera vinculada a esta empresa
+      const valorRetenido = parseFloat(((parsedData.baseImponible * retencionSeleccionada.porcentaje) / 100).toFixed(2));
+      const netoAPagar = parseFloat((parsedData.total - valorRetenido).toFixed(2));
+
+      // 1. Crear la transacción cabecera
       const { data: transaccion, error: tError } = await supabase
         .from('transacciones')
         .insert({
-          fecha: new Date(parsedData.fechaEmision.split('/').reverse().join('-')), // DD/MM/YYYY a YYYY-MM-DD
-          concepto: `Compra: ${parsedData.razonSocialEmisor} - Ret (${retencionSeleccionada.codigo})`,
+          fecha: new Date(parsedData.fechaEmision.split('/').reverse().join('-')),
+          concepto: `Compra: ${parsedData.razonSocialEmisor} - Fac: ${parsedData.numeroComprobante}`,
           tipo_comprobante: 'Factura',
           numero_comprobante: parsedData.numeroComprobante,
-          id_entidad: entidad?.id,
+          id_entidad: entidadId,
           xml_referencia: parsedData.claveAcceso,
-          id_empresa: empresaId
+          id_empresa: empresaId,
+          id_usuario: user.id
         })
         .select()
         .single();
       
       if (tError) throw tError;
 
-      // 3. Construir la matriz de retenciones para el ATS
-      const retencionesAplicadas = [];
-      const valorRetenido = (parsedData.baseImponible * retencionSeleccionada.porcentaje) / 100;
-      
-      if (valorRetenido > 0) {
-        retencionesAplicadas.push({
+      // 2. Insertar los MOVIMIENTOS (Doble Partida)
+      const batchMovimientos = [
+        // DEBE: Inventario o Gasto 
+        {
+          id_transaccion: transaccion.id,
+          id_cuenta: idCuentaGasto,
+          debe: parsedData.total,
+          haber: 0,
+          id_empresa: empresaId
+        },
+        // HABER: Retención (Si existe)
+        ...(valorRetenido > 0 ? [{
+          id_transaccion: transaccion.id,
+          id_cuenta: '3718919b-c430-473d-9860-313d330db340', 
+          debe: 0,
+          haber: valorRetenido,
+          id_empresa: empresaId
+        }] : []),
+        // HABER: Cuenta por Pagar (Neto)
+        {
+          id_transaccion: transaccion.id,
+          id_cuenta: idCuentaPago,
+          debe: 0,
+          haber: valorRetenido > 0 ? netoAPagar : parsedData.total,
+          id_empresa: empresaId
+        }
+      ];
+
+      const { error: mError } = await supabase.from('movimientos').insert(batchMovimientos);
+      if (mError) throw mError;
+
+      // 3. Crear el documento SRI técnico
+      const retencionesAplicadas = valorRetenido > 0 ? [{
           codigo: retencionSeleccionada.codigo,
           porcentaje: retencionSeleccionada.porcentaje,
           base: parsedData.baseImponible,
-          valor: parseFloat(valorRetenido.toFixed(2)),
+          valor: valorRetenido,
           tipo: 'RENTA'
-        });
-      }
+      }] : [];
 
-      // 4. Crear el documento SRI
-      await supabase.from('documentos_sri').insert({
+      const { error: dError } = await supabase.from('documentos_sri').insert({
         id_transaccion: transaccion.id,
         clave_acceso_xml: parsedData.claveAcceso,
         base_12: parsedData.baseImponible,
         monto_iva: parsedData.iva,
-        retenciones_aplicadas: retencionesAplicadas // 👈 ¡Se guarda la retención dinámicamente!
+        retenciones_aplicadas: retencionesAplicadas,
+        id_empresa: empresaId
       });
 
-      // 5. Futuro: Aquí crearíamos los asientos de partida doble en "movimientos" descontando la retención del pasivo final.
+      if (dError) throw dError;
 
       setStatus('success');
       setTimeout(() => {
@@ -137,11 +223,13 @@ export const XMLUploadModal: React.FC<XMLUploadModalProps> = ({ isOpen, empresaI
         onClose();
         setFile(null);
         setParsedData(null);
+        setEntidadId(null);
         setStatus('idle');
       }, 1500);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Save error:", error);
+      alert(`Error al guardar: ${error.message}`);
       setStatus('error');
     } finally {
       setSaving(false);
@@ -151,11 +239,11 @@ export const XMLUploadModal: React.FC<XMLUploadModalProps> = ({ isOpen, empresaI
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="glass-card w-full max-w-lg p-0 overflow-hidden"
+        className="glass-card w-full max-w-2xl p-0 overflow-hidden"
       >
         <div className="p-6 border-b border-white/10 flex-between">
           <h3 className="text-xl font-bold flex items-center gap-2">
@@ -164,15 +252,17 @@ export const XMLUploadModal: React.FC<XMLUploadModalProps> = ({ isOpen, empresaI
           <button onClick={onClose} className="text-sec hover:text-white"><X size={24} /></button>
         </div>
 
-        <div className="p-8">
+        <div className="p-8 max-h-[85vh] overflow-y-auto custom-scrollbar">
           {!file ? (
             <div 
               onClick={() => document.getElementById('xmlInput')?.click()}
-              className="border-2 border-dashed border-white/10 rounded-2xl p-12 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all"
+              className="border-2 border-dashed border-white/10 rounded-2xl p-12 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all group"
             >
-              <Upload className="mx-auto mb-4 text-primary opacity-50" size={48} />
-              <p className="font-semibold text-lg">Arrastra archivos .xml o haz clic</p>
-              <p className="text-sec text-sm mt-2">Facturas electrónicas descargadas del SRI</p>
+              <div className="mx-auto mb-4 w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Upload className="text-primary" size={40} />
+              </div>
+              <p className="font-bold text-xl mb-2">Sube tu factura XML</p>
+              <p className="text-sec text-sm max-w-xs mx-auto">Arrastra el archivo electrónico del SRI o haz clic para seleccionar</p>
               <input 
                 id="xmlInput" 
                 type="file" 
@@ -182,94 +272,199 @@ export const XMLUploadModal: React.FC<XMLUploadModalProps> = ({ isOpen, empresaI
               />
             </div>
           ) : (
-            <div className="space-y-4">
-              <div className="flex items-center gap-4 bg-white/5 p-4 rounded-xl border border-white/10">
-                <FileText className="text-primary" />
+            <div className="space-y-6">
+              <div className="flex items-center gap-4 bg-white/5 p-4 rounded-xl border border-white/10 shadow-inner">
+                <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center">
+                  <FileText className="text-primary" />
+                </div>
                 <div className="flex-1 overflow-hidden">
-                  <p className="font-semibold truncate">{file.name}</p>
+                  <p className="font-bold text-lg truncate">{file.name}</p>
                   <p className="text-xs text-sec">{(file.size / 1024).toFixed(1)} KB</p>
                 </div>
-                {parsing && <Loader2 className="animate-spin text-primary" size={20} />}
-                {parsedData && <CheckCircle2 className="text-success" size={20} />}
+                <div className="flex items-center gap-3">
+                  <button 
+                    onClick={() => {
+                        setFile(null);
+                        setParsedData(null);
+                    }}
+                    className="text-xs font-bold text-primary hover:underline"
+                  >
+                    Cambiar
+                  </button>
+                  {(parsing || verifyingEntidad) && <Loader2 className="animate-spin text-primary" size={24} />}
+                  {parsedData && !verifyingEntidad && <CheckCircle2 className="text-success shadow-success/20" size={24} />}
+                </div>
               </div>
 
-              <AnimatePresence>
-                {parsedData && (
+              <AnimatePresence mode="wait">
+                {showCreateEntidad && parsedData && (
                   <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    className="space-y-4 text-sm"
+                    key="create-entidad"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="space-y-4"
                   >
-                    <div className="p-4 bg-white/5 rounded-xl border border-white/10 space-y-2">
-                      <div className="flex justify-between">
-                        <span className="text-sec">Emisor:</span>
-                        <span className="font-semibold text-right">{parsedData.razonSocialEmisor}</span>
+                    <div className="bg-warning/10 border border-warning/30 p-4 rounded-xl flex gap-3 text-warning">
+                      <AlertCircle size={24} className="shrink-0" />
+                      <div>
+                        <p className="font-bold">Proveedor no encontrado</p>
+                        <p className="text-xs opacity-90">El RUC {parsedData.rucEmisor} no está registrado en tu base de datos de entidades.</p>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-sec">Fecha:</span>
-                        <span className="font-semibold">{parsedData.fechaEmision}</span>
+                    </div>
+                    
+                    <EntidadQuickForm 
+                      ruc={parsedData.rucEmisor}
+                      razonSocial={parsedData.razonSocialEmisor}
+                      empresaId={empresaId}
+                      onSuccess={(id) => {
+                        setEntidadId(id);
+                        setShowCreateEntidad(false);
+                      }}
+                      onCancel={() => {
+                        setFile(null);
+                        setParsedData(null);
+                        setShowCreateEntidad(false);
+                      }}
+                    />
+                  </motion.div>
+                )}
+
+                {parsedData && entidadId && (
+                  <motion.div
+                    key="summary"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="space-y-6"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="p-4 bg-white/5 rounded-2xl border border-white/10">
+                        <span className="text-xs text-sec uppercase tracking-wider font-bold block mb-2">Proveedor Verificado</span>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 size={16} className="text-success mt-1 shrink-0" />
+                          <div>
+                            <p className="font-bold text-sm leading-tight">{parsedData.razonSocialEmisor}</p>
+                            <p className="text-xs text-sec mt-1">RUC: {parsedData.rucEmisor}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="p-4 bg-white/5 rounded-2xl border border-white/10">
+                        <span className="text-xs text-sec uppercase tracking-wider font-bold block mb-2">Información del SRI</span>
+                        <p className="font-bold text-sm">Factura: <span className="text-primary">{parsedData.numeroComprobante}</span></p>
+                        <p className="text-xs text-sec mt-1">Emisión: {parsedData.fechaEmision}</p>
                       </div>
                     </div>
 
-                    {/* NUEVO: SELECCIÓN DE RETENCIÓN */}
-                    <div className="p-4 bg-primary/10 rounded-xl border border-primary/20 space-y-3">
-                      <label className="flex items-center gap-2 font-semibold text-primary mb-2">
-                        <Percent size={16} /> Concepto de Retención (IR)
-                      </label>
-                      <select 
-                        className="w-full bg-black/20 border border-primary/30 rounded-lg p-2 text-white outline-none"
-                        value={retencionCodigo}
-                        onChange={(e) => setRetencionCodigo(e.target.value)}
+                    <div className="p-6 bg-primary/5 rounded-2xl border border-primary/20 space-y-4">
+                      <div className="flex items-center gap-2 font-bold text-primary mb-2 text-sm uppercase tracking-wide">
+                        <FileText size={18} /> Central Accounting (Libro Diario)
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-[10px] text-sec uppercase font-bold px-1">Debe (Gasto/Inventario)</label>
+                          <select 
+                            className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white text-xs outline-none focus:border-primary"
+                            value={idCuentaGasto}
+                            onChange={(e) => setIdCuentaGasto(e.target.value)}
+                          >
+                            <option value="">Seleccionar cuenta...</option>
+                            {accounts.filter(a => a.tipo === 'Gasto' || a.tipo === 'Activo').map(a => (
+                              <option key={a.id} value={a.id}>{a.codigo_cuenta} - {a.nombre}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] text-sec uppercase font-bold px-1">Haber (Pago/Pasivo)</label>
+                          <select 
+                            className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white text-xs outline-none focus:border-primary"
+                            value={idCuentaPago}
+                            onChange={(e) => setIdCuentaPago(e.target.value)}
+                          >
+                            <option value="">Seleccionar cuenta...</option>
+                            {accounts.filter(a => a.tipo === 'Pasivo' || a.tipo === 'Activo').map(a => (
+                              <option key={a.id} value={a.id}>{a.codigo_cuenta} - {a.nombre}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="pt-2">
+                        <label className="text-[10px] text-sec uppercase font-bold px-1">Retención de Impuesto</label>
+                        <select 
+                          className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white text-xs outline-none focus:border-primary mt-1"
+                          value={retencionCodigo}
+                          onChange={(e) => setRetencionCodigo(e.target.value)}
+                        >
+                          {CATALOGO_RETENCIONES_RENTA.map(r => (
+                            <option key={r.codigo} value={r.codigo}>{r.codigo} - {r.descripcion} ({r.porcentaje}%)</option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      <div className="pt-4 border-t border-primary/10 space-y-2">
+                        <div className="flex justify-between text-xs">
+                          <span className="text-sec">Subtotal Grava IVA:</span>
+                          <span className="font-bold">${parsedData.baseImponible.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-sec">IVA Detallado:</span>
+                          <span className="font-bold">${parsedData.iva.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-warning font-bold text-xs">
+                          <span>Retención IR ({retencionSeleccionada.porcentaje}%):</span>
+                          <span>- ${valorRetenido.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-base border-t border-white/10 pt-3 mt-2">
+                          <span className="font-extrabold">Total Asiento:</span>
+                          <span className="font-black text-primary">
+                            ${(parsedData.total - valorRetenido).toFixed(2)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <footer className="pt-4 flex gap-4">
+                      <button 
+                        onClick={() => {
+                          setFile(null);
+                          setParsedData(null);
+                          setEntidadId(null);
+                        }} 
+                        className="btn glass-card flex-1 justify-center h-12"
+                      >Reintentar</button>
+                      <button 
+                        disabled={!parsedData || saving || !entidadId} 
+                        onClick={handleSave}
+                        className="btn btn-primary flex-1 justify-center h-12 shadow-lg shadow-primary/20"
                       >
-                        {CATALOGO_RETENCIONES_RENTA.map(r => (
-                          <option key={r.codigo} value={r.codigo} style={{ background: '#1e293b' }}>
-                            {r.codigo} - {r.descripcion} ({r.porcentaje}%)
-                          </option>
-                        ))}
-                      </select>
-
-                      <div className="flex justify-between border-t border-primary/20 pt-2 mt-2">
-                        <span className="text-sec">Base 12% / 0%:</span>
-                        <span className="font-semibold">${parsedData.baseImponible.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sec">IVA:</span>
-                        <span className="font-semibold">${parsedData.iva.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between text-warning font-semibold">
-                        <span>Retención Calculada ({retencionSeleccionada.porcentaje}%):</span>
-                        <span>- ${((parsedData.baseImponible * retencionSeleccionada.porcentaje) / 100).toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between text-base border-t border-white/10 pt-2">
-                        <span className="font-bold">Total a Pagar (Neto):</span>
-                        <span className="font-extrabold text-primary">
-                          ${(parsedData.total - ((parsedData.baseImponible * retencionSeleccionada.porcentaje) / 100)).toFixed(2)}
-                        </span>
-                      </div>
-                    </div>
+                        {saving ? <Loader2 className="animate-spin" size={20} /> : <><Save size={20} /> Generar Asiento</>}
+                      </button>
+                    </footer>
                   </motion.div>
                 )}
               </AnimatePresence>
 
               {status === 'error' && (
-                <div className="flex items-center gap-2 text-error text-sm bg-error/10 p-3 rounded-lg border border-error/20">
-                  <AlertCircle size={16} /> Error al procesar el archivo. Formato no soportado.
+                <div className="flex items-center gap-3 text-error text-sm bg-error/10 p-4 rounded-xl border border-error/20">
+                  <AlertCircle size={20} /> 
+                  <p><strong>Error de Procesamiento:</strong> El archivo XML no parece ser una factura electrónica válida del SRI.</p>
                 </div>
               )}
 
-              <footer className="pt-4 flex gap-4">
-                <button 
-                  onClick={() => setFile(null)} 
-                  className="btn glass-card flex-1 justify-center"
-                >Reintentar</button>
-                <button 
-                  disabled={!parsedData || saving} 
-                  onClick={handleSave}
-                  className="btn btn-primary flex-1 justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+              {status === 'success' && (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex flex-col items-center justify-center p-12 text-center space-y-4"
                 >
-                  {saving ? <Loader2 className="animate-spin" size={20} /> : <><Save size={20} /> Guardar Asiento</>}
-                </button>
-              </footer>
+                  <div className="w-20 h-20 rounded-full bg-success/20 flex items-center justify-center">
+                    <CheckCircle2 className="text-success" size={48} />
+                  </div>
+                  <h3 className="text-2xl font-black">¡Factura Procesada!</h3>
+                  <p className="text-sec">El movimiento contable y el documento digital se han guardado con éxito.</p>
+                </motion.div>
+              )}
             </div>
           )}
         </div>
