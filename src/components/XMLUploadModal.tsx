@@ -45,6 +45,7 @@ export const XMLUploadModal: React.FC<XMLUploadModalProps> = ({ isOpen, empresaI
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [idCuentaGasto, setIdCuentaGasto] = useState<string>('');
   const [idCuentaPago, setIdCuentaPago] = useState<string>('');
+  const [idCuentaRetencion, setIdCuentaRetencion] = useState<string>('');
 
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -67,8 +68,10 @@ export const XMLUploadModal: React.FC<XMLUploadModalProps> = ({ isOpen, empresaI
         // Sugerir defaults
         const defaultGasto = data.find(a => a.codigo_cuenta.startsWith('5')) || data[0];
         const defaultPago = data.find(a => a.codigo_cuenta.startsWith('2.1.3')) || data[0];
+        const defaultRetencion = data.find(a => a.codigo_cuenta.startsWith('2.1.4') || a.nombre.toLowerCase().includes('retencion')) || data[0];
         if (defaultGasto) setIdCuentaGasto(defaultGasto.id);
         if (defaultPago) setIdCuentaPago(defaultPago.id);
+        if (defaultRetencion) setIdCuentaRetencion(defaultRetencion.id);
       }
     } catch (err) {
       console.error("Error fetching accounts:", err);
@@ -135,7 +138,7 @@ export const XMLUploadModal: React.FC<XMLUploadModalProps> = ({ isOpen, empresaI
   };
 
   const handleSave = async () => {
-    if (!parsedData || !empresaId || !entidadId || !idCuentaGasto || !idCuentaPago) {
+    if (!parsedData || !empresaId || !entidadId || !idCuentaGasto || !idCuentaPago || (valorRetenido > 0 && !idCuentaRetencion)) {
       alert("Por favor asegúrate de seleccionar todas las cuentas contables.");
       return;
     }
@@ -179,7 +182,7 @@ export const XMLUploadModal: React.FC<XMLUploadModalProps> = ({ isOpen, empresaI
         // HABER: Retención (Si existe)
         ...(valorRetenido > 0 ? [{
           id_transaccion: transaccion.id,
-          id_cuenta: '3718919b-c430-473d-9860-313d330db340', 
+          id_cuenta: idCuentaRetencion, 
           debe: 0,
           haber: valorRetenido,
           id_empresa: empresaId
@@ -389,17 +392,35 @@ export const XMLUploadModal: React.FC<XMLUploadModalProps> = ({ isOpen, empresaI
                         </div>
                       </div>
 
-                      <div className="pt-2">
-                        <label className="text-[10px] text-sec uppercase font-bold px-1">Retención de Impuesto</label>
-                        <select 
-                          className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white text-xs outline-none focus:border-primary mt-1"
-                          value={retencionCodigo}
-                          onChange={(e) => setRetencionCodigo(e.target.value)}
-                        >
-                          {CATALOGO_RETENCIONES_RENTA.map(r => (
-                            <option key={r.codigo} value={r.codigo}>{r.codigo} - {r.descripcion} ({r.porcentaje}%)</option>
-                          ))}
-                        </select>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 border-t border-white/5 pt-3">
+                        <div className="space-y-1">
+                          <label className="text-[10px] text-sec uppercase font-bold px-1">Concepto de Retención</label>
+                          <select 
+                            className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white text-xs outline-none focus:border-primary"
+                            value={retencionCodigo}
+                            onChange={(e) => setRetencionCodigo(e.target.value)}
+                          >
+                            {CATALOGO_RETENCIONES_RENTA.map(r => (
+                              <option key={r.codigo} value={r.codigo}>{r.codigo} - {r.descripcion} ({r.porcentaje}%)</option>
+                            ))}
+                          </select>
+                        </div>
+                        
+                        {valorRetenido > 0 && (
+                          <div className="space-y-1">
+                            <label className="text-[10px] text-warning uppercase font-bold px-1">Cuenta Contable (Retención)</label>
+                            <select 
+                              className="w-full bg-warning/10 border border-warning/30 rounded-xl p-3 text-white text-xs outline-none focus:border-warning"
+                              value={idCuentaRetencion}
+                              onChange={(e) => setIdCuentaRetencion(e.target.value)}
+                            >
+                              <option value="">Seleccionar cuenta pasivo...</option>
+                              {accounts.filter(a => a.tipo === 'Pasivo').map(a => (
+                                <option key={a.id} value={a.id}>{a.codigo_cuenta} - {a.nombre}</option>
+                              ))}
+                            </select>
+                          </div>
+                        )}
                       </div>
                       
                       <div className="pt-4 border-t border-primary/10 space-y-2">

@@ -24,6 +24,7 @@ import { DashboardView } from './views/Dashboard';
 import { Sidebar } from './components/Sidebar';
 import { SRIAutomation } from './views/SRIAutomation';
 import { LibroDiario } from './views/LibroDiario';
+import { Tesoreria } from './views/Tesoreria';
 
 interface Empresa {
   id: string;
@@ -152,8 +153,19 @@ const App = () => {
       case 'libro-diario': return <LibroDiario empresaId={selectedEmpresa.id} />;
       case 'entidades': return <Entidades empresaId={selectedEmpresa.id} />;
       case 'plan-cuentas': return <PlanCuentas empresaId={selectedEmpresa.id} />;
-      case 'asientos': return <Asientos />;
-      case 'reportes': return <Reportes />;
+      case 'asientos': return <Asientos empresaId={selectedEmpresa.id} />;
+      case 'tesoreria': return <Tesoreria empresaId={selectedEmpresa.id} mode="resumen" />;
+      case 'cobros': return <Tesoreria empresaId={selectedEmpresa.id} mode="cobros" />;
+      case 'pagos': return <Tesoreria empresaId={selectedEmpresa.id} mode="pagos" />;
+      case 'conciliacion': return <Tesoreria empresaId={selectedEmpresa.id} mode="conciliacion" />;
+      case 'reportes': return <Reportes empresaId={selectedEmpresa.id} />;
+      case 'reportes-fiscales':
+        return (
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-card flex-center flex-col" style={{ textAlign: 'center', padding: '100px 0', marginTop: '40px' }}>
+            <h2 className="h1">ATS pendiente</h2>
+            <p className="text-sec">El ATS se dejó para la siguiente fase. Tesorería y reportes financieros ya quedaron listos.</p>
+          </motion.div>
+        );
       case 'config': return <Configuracion />;
       case 'perfil': return <Perfil />;
       default:

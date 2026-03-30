@@ -53,8 +53,10 @@ export const MENU_STRUCTURE = [
     isParent: true,
     icon: Wallet,
     children: [
+      { id: 'tesoreria', label: 'Resumen Tesorería', icon: Wallet },
       { id: 'cobros', label: 'Cobros a Clientes', icon: CreditCard },
       { id: 'pagos', label: 'Pagos a Proveedores', icon: CreditCard },
+      { id: 'conciliacion', label: 'Conciliación y Flujo', icon: FileText },
     ]
   },
   {
