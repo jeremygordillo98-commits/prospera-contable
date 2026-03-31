@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Wallet, Landmark, ArrowDownCircle, ArrowUpCircle, Repeat, BellRing, Loader2, Plus, CheckCircle2 } from 'lucide-react';
+import { Wallet, Landmark, ArrowDownCircle, ArrowUpCircle, Repeat, Loader2, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../services/supabase';
 
 interface Props { empresaId: string; mode?: 'resumen' | 'cobros' | 'pagos' | 'conciliacion'; }
 interface CuentaFinanciera { id: string; nombre: string; tipo: string; saldo_inicial: number | null; moneda: string | null; numero_referencia: string | null; }
-interface DocumentoTesoreria { id: string; fecha_emision: string; fecha_vencimiento: string | null; tipo_documento: string; referencia: string | null; concepto: string; saldo_pendiente: number; total: number; estado: string; entidades?: { razon_social: string } | null; }
-interface MovimientoTesoreria { id: string; fecha: string; tipo_movimiento: string; concepto: string; monto: number; estado: string; referencia: string | null; cuenta_financiera?: { nombre: string } | null; entidades?: { razon_social: string } | null; documento?: { referencia: string | null; concepto: string } | null; }
+interface DocumentoTesoreria { id: string; fecha_emision: string; fecha_vencimiento: string | null; tipo_documento: string; referencia: string | null; concepto: string; saldo_pendiente: number; total: number; estado: string; entidades?: { id?: string; razon_social: string } | null; }
+interface MovimientoTesoreria { id: string; fecha: string; tipo_movimiento: string; concepto: string; monto: number; estado: string; referencia: string | null; cuenta_financiera?: { nombre: string } | null; entidades?: { id?: string; razon_social: string } | null; documento?: { referencia: string | null; concepto: string } | null; }
 interface Entity { id: string; razon_social: string; tipo_entidad: string; }
 
 const inputStyle: React.CSSProperties = {
@@ -41,8 +41,8 @@ export const Tesoreria: React.FC<Props> = ({ empresaId, mode = 'resumen' }) => {
     try {
       const [cuentasRes, docsRes, movRes, entRes] = await Promise.all([
         supabase.from('cuentas_financieras').select('*').eq('id_empresa', empresaId).order('nombre'),
-        supabase.from('tesoreria_documentos').select('id,fecha_emision,fecha_vencimiento,tipo_documento,referencia,concepto,saldo_pendiente,total,estado,entidades(razon_social)').eq('id_empresa', empresaId).order('fecha_emision', { ascending: false }),
-        supabase.from('tesoreria_movimientos').select('id,fecha,tipo_movimiento,concepto,monto,estado,referencia,cuenta_financiera:cuentas_financieras(nombre),entidades(razon_social),documento:tesoreria_documentos(referencia,concepto)').eq('id_empresa', empresaId).order('fecha', { ascending: false }).limit(30),
+        supabase.from('tesoreria_documentos').select('id,fecha_emision,fecha_vencimiento,tipo_documento,referencia,concepto,saldo_pendiente,total,estado,entidades(id,razon_social)').eq('id_empresa', empresaId).order('fecha_emision', { ascending: false }),
+        supabase.from('tesoreria_movimientos').select('id,fecha,tipo_movimiento,concepto,monto,estado,referencia,cuenta_financiera:cuentas_financieras(nombre),entidades(id,razon_social),documento:tesoreria_documentos(referencia,concepto)').eq('id_empresa', empresaId).order('fecha', { ascending: false }).limit(30),
         supabase.from('entidades').select('id,razon_social,tipo_entidad').eq('id_empresa', empresaId).order('razon_social')
       ]);
 
@@ -175,35 +175,30 @@ export const Tesoreria: React.FC<Props> = ({ empresaId, mode = 'resumen' }) => {
     } finally { setSaving(false); }
   };
 
-  if (loading) return <div className="flex-center" style={{ padding: '120px 0' }}><Loader2 className="animate-spin" size={36} style={{ color: 'var(--primary)' }} /></div>;
+  // --- RENDERIZADO POR MODOS ---
 
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-      <header className="flex-between" style={{ flexWrap: 'wrap', gap: 16 }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--primary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, fontSize: '0.8rem', marginBottom: 8 }}>
-            <Wallet size={14} /> Tesorería Inteligente
-          </div>
-          <h1 className="h1" style={{ fontSize: '2.2rem' }}>
-            {mode === 'cobros' ? 'Cobros a Clientes' : mode === 'pagos' ? 'Pagos a Proveedores' : mode === 'conciliacion' ? 'Conciliación y Flujo' : 'Resumen de Tesorería'}
-          </h1>
-          <p className="text-sec">Controla saldos, obligaciones, cobros y pagos desde una sola vista.</p>
+  const renderResumen = () => (
+    <div className="space-y-6" style={{ animation: 'fadeIn 0.5s ease' }}>
+      <header>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--primary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, fontSize: '0.8rem', marginBottom: 8 }}>
+            <Landmark size={14} /> Panorama Financiero
         </div>
-        <button className="btn btn-primary" onClick={() => setShowCuentaForm((v) => !v)}><Plus size={18} /> Nueva cuenta financiera</button>
+        <h2 className="h1" style={{ fontSize: '2.2rem' }}>Centro de Mando de Tesorería</h2>
+        <p className="text-sec">Visión general del efectivo, obligaciones y liquidez de la empresa.</p>
       </header>
 
       <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: 16 }}>
         {[
-          { label: 'Disponible', value: summary.disponible, icon: Landmark },
-          { label: 'Por cobrar', value: summary.porCobrar, icon: ArrowDownCircle },
-          { label: 'Por pagar', value: summary.porPagar, icon: ArrowUpCircle },
-          { label: 'Saldo proyectado', value: summary.proyectado, icon: Repeat },
+          { label: 'Efectivo Disponible', value: summary.disponible, icon: Wallet },
+          { label: 'Cuentas por Cobrar', value: summary.porCobrar, icon: ArrowDownCircle },
+          { label: 'Cuentas por Pagar', value: summary.porPagar, icon: ArrowUpCircle },
+          { label: 'Liquidez Proyectada', value: summary.proyectado, icon: Repeat },
         ].map((item) => (
           <div key={item.label} className="glass-card" style={{ padding: 20 }}>
             <div className="flex-between">
               <div>
                 <div style={cardTitle}>{item.label}</div>
-                <div style={{ fontSize: '1.8rem', fontWeight: 900, marginTop: 8 }}>${item.value.toFixed(2)}</div>
+                <div style={{ fontSize: '1.8rem', fontWeight: 900, marginTop: 8, color: item.value < 0 ? 'var(--error)' : 'var(--text-main)' }}>${item.value.toFixed(2)}</div>
               </div>
               <div style={{ width: 48, height: 48, borderRadius: 16, background: 'var(--primary-light)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <item.icon size={24} />
@@ -213,103 +208,300 @@ export const Tesoreria: React.FC<Props> = ({ empresaId, mode = 'resumen' }) => {
         ))}
       </section>
 
-      {showCuentaForm && (
-        <form className="glass-card" onSubmit={handleCrearCuenta} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 12 }}>
-          <div><label className="text-sec" style={{ display: 'block', marginBottom: 8 }}>Nombre</label><input value={cuentaForm.nombre} onChange={(e) => setCuentaForm({ ...cuentaForm, nombre: e.target.value })} style={inputStyle} required /></div>
-          <div><label className="text-sec" style={{ display: 'block', marginBottom: 8 }}>Tipo</label><select value={cuentaForm.tipo} onChange={(e) => setCuentaForm({ ...cuentaForm, tipo: e.target.value })} style={inputStyle}><option>Banco</option><option>Caja</option><option>Tarjeta</option></select></div>
-          <div><label className="text-sec" style={{ display: 'block', marginBottom: 8 }}>Saldo inicial</label><input value={cuentaForm.saldo_inicial} onChange={(e) => setCuentaForm({ ...cuentaForm, saldo_inicial: e.target.value })} style={inputStyle} inputMode="decimal" /></div>
-          <div><label className="text-sec" style={{ display: 'block', marginBottom: 8 }}>Referencia</label><input value={cuentaForm.numero_referencia} onChange={(e) => setCuentaForm({ ...cuentaForm, numero_referencia: e.target.value })} style={inputStyle} /></div>
-          <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'flex-end' }}><button className="btn btn-primary" disabled={saving}>{saving ? 'Guardando…' : 'Guardar cuenta'}</button></div>
-        </form>
-      )}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 24 }}>
+          {/* Cuentas Financieras Totales */}
+          <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
+            <div style={{ padding: 20, borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ margin: 0 }}>Cuentas Registradas</h3>
+              <button 
+                  style={{ background: 'none', border: 'none', color: 'var(--primary)', fontWeight: 800, cursor: 'pointer', fontSize: '0.85rem' }}
+                  onClick={() => setShowCuentaForm(v => !v)}
+              >
+                  + Nueva
+              </button>
+            </div>
+            
+            {showCuentaForm && (
+                <form onSubmit={handleCrearCuenta} style={{ padding: 20, background: 'var(--primary-light)' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        <input value={cuentaForm.nombre} onChange={e => setCuentaForm({...cuentaForm, nombre: e.target.value})} style={inputStyle} placeholder="Nombre (Ej. Banco Pichincha, Caja)" required />
+                        <select value={cuentaForm.tipo} onChange={e => setCuentaForm({...cuentaForm, tipo: e.target.value})} style={inputStyle}>
+                            <option>Banco</option><option>Caja</option>
+                        </select>
+                        <input value={cuentaForm.saldo_inicial} onChange={e => setCuentaForm({...cuentaForm, saldo_inicial: e.target.value})} style={inputStyle} placeholder="Saldo Inicial" required />
+                        <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Guardar</button>
+                    </div>
+                </form>
+            )}
 
-      {message && <div className="glass-card" style={{ padding: 16, color: message.includes('No se pudo') ? 'var(--warning)' : 'var(--success)', fontWeight: 700 }}>{message}</div>}
-
-      <section style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.2fr) minmax(0,1fr)', gap: 20 }}>
-        <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
-          <div style={{ padding: 20, borderBottom: '1px solid var(--border-color)' }}>
-            <h3 style={{ margin: 0 }}>Documentos de tesorería</h3>
-            <p className="text-sec" style={{ margin: '6px 0 0' }}>Facturas, obligaciones y derechos de cobro pendientes.</p>
-          </div>
-          <div style={{ overflowX: 'auto' }}>
-            <table className="data-table" style={{ minWidth: 620 }}>
-              <thead><tr><th>Tipo</th><th>Tercero</th><th>Referencia</th><th>Vence</th><th>Saldo</th><th>Estado</th></tr></thead>
-              <tbody>
-                {docsFiltrados.slice(0, 12).map((doc) => (
-                  <tr key={doc.id}>
-                    <td style={{ padding: 12 }}>{doc.tipo_documento}</td>
-                    <td style={{ padding: 12 }}>{doc.entidades?.razon_social || 'Sin tercero'}</td>
-                    <td style={{ padding: 12 }}>{doc.referencia || doc.concepto}</td>
-                    <td style={{ padding: 12 }}>{doc.fecha_vencimiento || '—'}</td>
-                    <td style={{ padding: 12, fontWeight: 800 }}>${Number(doc.saldo_pendiente || 0).toFixed(2)}</td>
-                    <td style={{ padding: 12 }}><span style={{ fontSize: '0.75rem', padding: '4px 8px', borderRadius: 999, background: 'var(--primary-light)', color: 'var(--primary)', fontWeight: 700 }}>{doc.estado}</span></td>
-                  </tr>
+            <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                {cuentas.map(c => (
+                    <div key={c.id} className="flex-between" style={{ paddingBottom: 12, borderBottom: '1px dashed var(--border-color)' }}>
+                        <div>
+                            <div style={{ fontWeight: 800 }}>{c.nombre}</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-sec)' }}>{c.tipo}</div>
+                        </div>
+                        <div style={{ fontWeight: 900, fontSize: '1.1rem' }}>${Number(c.saldo_inicial).toFixed(2)}</div>
+                    </div>
                 ))}
-                {docsFiltrados.length === 0 && <tr><td colSpan={6} style={{ padding: 28, textAlign: 'center', color: 'var(--text-sec)' }}>No hay documentos registrados.</td></tr>}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          <form className="glass-card" onSubmit={handleCrearDocumento}>
-            <div className="flex-between" style={{ marginBottom: 16 }}><h3 style={{ margin: 0, fontSize: '1rem' }}>Nueva obligación / derecho</h3><BellRing size={18} className="text-primary" /></div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <div style={{ gridColumn: '1 / -1' }}><label className="text-sec" style={{ display: 'block', marginBottom: 8 }}>Tipo</label><select value={docForm.tipo_documento} onChange={(e) => setDocForm({ ...docForm, tipo_documento: e.target.value })} style={inputStyle}><option>Cuenta por cobrar</option><option>Cuenta por pagar</option></select></div>
-              <div><label className="text-sec" style={{ display: 'block', marginBottom: 8 }}>Fecha emisión</label><input type="date" value={docForm.fecha_emision} onChange={(e) => setDocForm({ ...docForm, fecha_emision: e.target.value })} style={inputStyle} /></div>
-              <div><label className="text-sec" style={{ display: 'block', marginBottom: 8 }}>Fecha vencimiento</label><input type="date" value={docForm.fecha_vencimiento} onChange={(e) => setDocForm({ ...docForm, fecha_vencimiento: e.target.value })} style={inputStyle} /></div>
-              <div style={{ gridColumn: '1 / -1' }}><label className="text-sec" style={{ display: 'block', marginBottom: 8 }}>Tercero</label><select value={docForm.id_entidad} onChange={(e) => setDocForm({ ...docForm, id_entidad: e.target.value })} style={inputStyle}><option value="">Selecciona</option>{entities.map((entity) => <option key={entity.id} value={entity.id}>{entity.razon_social}</option>)}</select></div>
-              <div style={{ gridColumn: '1 / -1' }}><label className="text-sec" style={{ display: 'block', marginBottom: 8 }}>Concepto</label><input value={docForm.concepto} onChange={(e) => setDocForm({ ...docForm, concepto: e.target.value })} style={inputStyle} required /></div>
-              <div><label className="text-sec" style={{ display: 'block', marginBottom: 8 }}>Referencia</label><input value={docForm.referencia} onChange={(e) => setDocForm({ ...docForm, referencia: e.target.value })} style={inputStyle} /></div>
-              <div><label className="text-sec" style={{ display: 'block', marginBottom: 8 }}>Valor</label><input value={docForm.total} onChange={(e) => setDocForm({ ...docForm, total: e.target.value })} style={inputStyle} inputMode="decimal" required /></div>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}><button className="btn btn-primary" disabled={saving}>Guardar documento</button></div>
-          </form>
-
-          <form className="glass-card" onSubmit={handleRegistrarMovimiento}>
-            <div className="flex-between" style={{ marginBottom: 16 }}><h3 style={{ margin: 0, fontSize: '1rem' }}>{mode === 'pagos' ? 'Registrar pago' : 'Registrar cobro'}</h3><CheckCircle2 size={18} className="text-primary" /></div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <div><label className="text-sec" style={{ display: 'block', marginBottom: 8 }}>Fecha</label><input type="date" value={movForm.fecha} onChange={(e) => setMovForm({ ...movForm, fecha: e.target.value })} style={inputStyle} /></div>
-              <div><label className="text-sec" style={{ display: 'block', marginBottom: 8 }}>Tipo movimiento</label><select value={movForm.tipo_movimiento} onChange={(e) => setMovForm({ ...movForm, tipo_movimiento: e.target.value })} style={inputStyle}><option>Cobro</option><option>Pago</option><option>Transferencia</option><option>Ajuste</option></select></div>
-              <div style={{ gridColumn: '1 / -1' }}><label className="text-sec" style={{ display: 'block', marginBottom: 8 }}>Concepto</label><input value={movForm.concepto} onChange={(e) => setMovForm({ ...movForm, concepto: e.target.value })} style={inputStyle} required /></div>
-              <div><label className="text-sec" style={{ display: 'block', marginBottom: 8 }}>Cuenta financiera</label><select value={movForm.id_cuenta_financiera} onChange={(e) => setMovForm({ ...movForm, id_cuenta_financiera: e.target.value })} style={inputStyle}><option value="">Selecciona</option>{cuentas.map((cuenta) => <option key={cuenta.id} value={cuenta.id}>{cuenta.nombre}</option>)}</select></div>
-              <div><label className="text-sec" style={{ display: 'block', marginBottom: 8 }}>Monto</label><input value={movForm.monto} onChange={(e) => setMovForm({ ...movForm, monto: e.target.value })} style={inputStyle} inputMode="decimal" required /></div>
-              <div><label className="text-sec" style={{ display: 'block', marginBottom: 8 }}>Tercero</label><select value={movForm.id_entidad} onChange={(e) => setMovForm({ ...movForm, id_entidad: e.target.value })} style={inputStyle}><option value="">Selecciona</option>{entities.map((entity) => <option key={entity.id} value={entity.id}>{entity.razon_social}</option>)}</select></div>
-              <div><label className="text-sec" style={{ display: 'block', marginBottom: 8 }}>Documento</label><select value={movForm.id_documento} onChange={(e) => setMovForm({ ...movForm, id_documento: e.target.value })} style={inputStyle}><option value="">Sin vincular</option>{docsFiltrados.map((doc) => <option key={doc.id} value={doc.id}>{doc.referencia || doc.concepto} · ${Number(doc.saldo_pendiente || 0).toFixed(2)}</option>)}</select></div>
-              <div style={{ gridColumn: '1 / -1' }}><label className="text-sec" style={{ display: 'block', marginBottom: 8 }}>Referencia bancaria</label><input value={movForm.referencia} onChange={(e) => setMovForm({ ...movForm, referencia: e.target.value })} style={inputStyle} placeholder="Transferencia, depósito, voucher" /></div>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}><button className="btn btn-primary" disabled={saving}>{saving ? 'Guardando…' : 'Registrar movimiento'}</button></div>
-          </form>
-        </div>
-      </section>
-
-      <section className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
-        <div className="flex-between" style={{ padding: 20, borderBottom: '1px solid var(--border-color)' }}>
-          <div>
-            <h3 style={{ margin: 0 }}>Últimos movimientos</h3>
-            <p className="text-sec" style={{ margin: '6px 0 0' }}>Tu caja, bancos y aplicaciones recientes.</p>
           </div>
-          <div style={{ fontWeight: 800, color: 'var(--primary)' }}>Cobrado mes ${summary.cobradoMes.toFixed(2)} · Pagado mes ${summary.pagadoMes.toFixed(2)}</div>
-        </div>
-        <div style={{ overflowX: 'auto' }}>
-          <table className="data-table" style={{ minWidth: 760 }}>
-            <thead><tr><th>Fecha</th><th>Tipo</th><th>Concepto</th><th>Cuenta</th><th>Tercero</th><th>Monto</th></tr></thead>
-            <tbody>
-              {movimientos.map((mov) => (
-                <tr key={mov.id}>
-                  <td style={{ padding: 12 }}>{mov.fecha}</td>
-                  <td style={{ padding: 12 }}>{mov.tipo_movimiento}</td>
-                  <td style={{ padding: 12 }}>{mov.concepto}</td>
-                  <td style={{ padding: 12 }}>{mov.cuenta_financiera?.nombre || '—'}</td>
-                  <td style={{ padding: 12 }}>{mov.entidades?.razon_social || '—'}</td>
-                  <td style={{ padding: 12, fontWeight: 800, color: mov.tipo_movimiento === 'Cobro' ? 'var(--success)' : 'var(--text-main)' }}>${Number(mov.monto || 0).toFixed(2)}</td>
-                </tr>
-              ))}
-              {movimientos.length === 0 && <tr><td colSpan={6} style={{ padding: 28, textAlign: 'center', color: 'var(--text-sec)' }}>Todavía no existen movimientos de tesorería.</td></tr>}
-            </tbody>
-          </table>
-        </div>
-      </section>
+
+          {/* Últimos Movimientos Generales */}
+          <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
+            <div className="flex-between" style={{ padding: 20, borderBottom: '1px solid var(--border-color)' }}>
+              <div>
+                <h3 style={{ margin: 0 }}>Flujo de Caja Reciente</h3>
+                <p className="text-sec" style={{ margin: '6px 0 0' }}>Últimas entradas y salidas de dinero.</p>
+              </div>
+              <div style={{ fontWeight: 800, fontSize: '0.85rem' }}>
+                  <span style={{ color: 'var(--success)', marginRight: 16 }}>Entró: ${summary.cobradoMes.toFixed(2)}</span>
+                  <span style={{ color: 'var(--warning)' }}>Salió: ${summary.pagadoMes.toFixed(2)}</span>
+              </div>
+            </div>
+            <div style={{ overflowX: 'auto' }}>
+              <table className="data-table">
+                <thead><tr><th>Fecha</th><th>Tercero</th><th>Concepto</th><th>Importe</th></tr></thead>
+                <tbody>
+                  {movimientos.slice(0, 8).map((mov) => (
+                    <tr key={mov.id}>
+                      <td style={{ padding: '12px 16px', fontSize: '0.85rem' }}>{mov.fecha}</td>
+                      <td style={{ padding: '12px 16px', fontWeight: 600 }}>{mov.entidades?.razon_social || 'N/A'}</td>
+                      <td style={{ padding: '12px 16px' }}>{mov.concepto}</td>
+                      <td style={{ padding: '12px 16px', fontWeight: 800, color: mov.tipo_movimiento === 'Cobro' ? 'var(--success)' : 'var(--text-main)', textAlign: 'right' }}>
+                          {mov.tipo_movimiento === 'Cobro' ? '+' : '-'}${Number(mov.monto).toFixed(2)}
+                      </td>
+                    </tr>
+                  ))}
+                  {movimientos.length === 0 && <tr><td colSpan={4} style={{ padding: 28, textAlign: 'center', color: 'var(--text-sec)' }}>Sin movimientos.</td></tr>}
+                </tbody>
+              </table>
+            </div>
+          </div>
+      </div>
     </div>
+  );
+
+  const renderCobrosPagos = () => {
+    const isCobro = mode === 'cobros';
+    const color = isCobro ? 'var(--success)' : 'var(--error)';
+    
+    return (
+    <div className="space-y-6" style={{ animation: 'fadeIn 0.5s ease' }}>
+        <header className="flex-between" style={{ alignItems: 'flex-start' }}>
+            <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--primary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, fontSize: '0.8rem', marginBottom: 8 }}>
+                    {isCobro ? <ArrowDownCircle size={14} /> : <ArrowUpCircle size={14} />} 
+                    Gestión de {isCobro ? 'Cobranzas' : 'Obligaciones'}
+                </div>
+                <h2 className="h1" style={{ fontSize: '2.2rem' }}>{isCobro ? 'Cuentas x Cobrar' : 'Cuentas x Pagar'}</h2>
+                <p className="text-sec">Administra tus facturas y registra {isCobro ? 'recibos' : 'desembolsos'}.</p>
+            </div>
+            
+            <div className="glass-card" style={{ padding: '16px 24px', textAlign: 'right', border: `1px solid ${color}33`, background: `${color}11` }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 800, color, textTransform: 'uppercase' }}>Total {isCobro ? 'Por Cobrar' : 'Por Pagar'}</div>
+                <div style={{ fontSize: '2rem', fontWeight: 900 }}>${isCobro ? summary.porCobrar.toFixed(2) : summary.porPagar.toFixed(2)}</div>
+            </div>
+        </header>
+
+        <section style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.5fr) minmax(0, 1fr)', gap: 24, alignItems: 'start' }}>
+            {/* Lista de Documentos Pendientes */}
+            <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
+                <div style={{ padding: 20, borderBottom: '1px solid var(--border-color)' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.2rem' }}>{isCobro ? 'Facturas de Clientes' : 'Facturas de Proveedores'}</h3>
+                    <p className="text-sec" style={{ fontSize: '0.85rem' }}>Documentos con saldos pendientes.</p>
+                </div>
+                <div style={{ overflowX: 'auto' }}>
+                    <table className="data-table">
+                    <thead><tr><th>Tercero</th><th>Referencia</th><th>Vence</th><th style={{ textAlign: 'right' }}>Saldo</th><th>Estado</th></tr></thead>
+                    <tbody>
+                        {docsFiltrados.map((doc) => (
+                        <tr key={doc.id}>
+                            <td style={{ padding: '14px 16px' }}>
+                                <div style={{ fontWeight: 800 }}>{doc.entidades?.razon_social || 'Sin tercero'}</div>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--text-sec)' }}>{doc.concepto}</div>
+                            </td>
+                            <td style={{ padding: '14px 16px', fontWeight: 600 }}>{doc.referencia}</td>
+                            <td style={{ padding: '14px 16px', fontSize: '0.85rem' }}>
+                                {doc.fecha_vencimiento}
+                                {doc.fecha_vencimiento && new Date(doc.fecha_vencimiento) < new Date() && doc.saldo_pendiente > 0 && 
+                                    <span style={{ color: 'var(--error)', marginLeft: 8, fontWeight: 800 }}>⚠️</span>}
+                            </td>
+                            <td style={{ padding: '14px 16px', fontWeight: 800, textAlign: 'right', color: doc.saldo_pendiente > 0 ? color : 'var(--text-main)' }}>
+                                ${Number(doc.saldo_pendiente || 0).toFixed(2)}
+                            </td>
+                            <td style={{ padding: '14px 16px', textAlign: 'center' }}>
+                                <span style={{ fontSize: '0.7rem', textTransform: 'uppercase', padding: '4px 8px', borderRadius: 999, background: doc.estado === 'Liquidado' ? 'rgba(16,185,129,0.1)' : 'var(--primary-light)', color: doc.estado === 'Liquidado' ? 'var(--success)' : 'var(--primary)', fontWeight: 800 }}>{doc.estado}</span>
+                            </td>
+                        </tr>
+                        ))}
+                        {docsFiltrados.length === 0 && <tr><td colSpan={5} style={{ padding: 40, textAlign: 'center', color: 'var(--text-sec)', fontWeight: 600 }}>No hay documentos pendientes aquí.</td></tr>}
+                    </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {/* Panel de Operaciones (Añadir Documento o Registrar Pago) */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                
+                {/* 1. Registrar Operación */}
+                <form className="glass-card" onSubmit={handleRegistrarMovimiento} style={{ border: `1px solid var(--primary)` }}>
+                    <h3 style={{ margin: '0 0 16px', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <CheckCircle2 color="var(--primary)" /> {isCobro ? 'Aplicar Cobro' : 'Aplicar Pago'}
+                    </h3>
+                    
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                        <div>
+                            <label className="text-sec" style={{ fontSize: '0.75rem', fontWeight: 800 }}>Documento a saldar</label>
+                            <select value={movForm.id_documento} onChange={e => {
+                                const did = e.target.value;
+                                const doc = docsFiltrados.find(d => d.id === did);
+                                setMovForm({...movForm, id_documento: e.target.value, id_entidad: doc?.entidades?.id || movForm.id_entidad, monto: doc ? String(doc.saldo_pendiente) : movForm.monto});
+                            }} style={inputStyle}>
+                                <option value="">Selecciona (Factura/Deuda)</option>
+                                {docsFiltrados.filter(d => d.saldo_pendiente > 0).map(doc => <option key={doc.id} value={doc.id}>{doc.entidades?.razon_social} - {doc.referencia} (${Number(doc.saldo_pendiente).toFixed(2)})</option>)}
+                            </select>
+                        </div>
+                        
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                            <div>
+                                <label className="text-sec" style={{ fontSize: '0.75rem', fontWeight: 800 }}>Monto a aplicar ($)</label>
+                                <input value={movForm.monto} onChange={e => setMovForm({...movForm, monto: e.target.value})} style={{...inputStyle, fontWeight: 900, color}} required />
+                            </div>
+                            <div>
+                                <label className="text-sec" style={{ fontSize: '0.75rem', fontWeight: 800 }}>Fecha</label>
+                                <input type="date" value={movForm.fecha} onChange={e => setMovForm({...movForm, fecha: e.target.value})} style={inputStyle} required />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="text-sec" style={{ fontSize: '0.75rem', fontWeight: 800 }}>Caja / Banco Origen</label>
+                            <select value={movForm.id_cuenta_financiera} onChange={e => setMovForm({...movForm, id_cuenta_financiera: e.target.value})} style={inputStyle} required>
+                                <option value="">Obligatorio</option>
+                                {cuentas.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+                            </select>
+                        </div>
+                        <input value={movForm.referencia} onChange={e => setMovForm({...movForm, referencia: e.target.value})} placeholder="Referencia bancaria / Voucher..." style={inputStyle} />
+                        
+                        <button className="btn btn-primary" type="submit" disabled={saving || !movForm.id_cuenta_financiera || !movForm.monto} style={{ width: '100%', marginTop: 8 }}>
+                            Confirmar Operación
+                        </button>
+                    </div>
+                </form>
+
+                {/* 2. Añadir Documento Manual */}
+                <form className="glass-card" onSubmit={handleCrearDocumento}>
+                    <h3 style={{ margin: '0 0 16px', fontSize: '1rem', color: 'var(--text-sec)' }}>Añadir Documento Manual</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        <select value={docForm.id_entidad} onChange={e => setDocForm({...docForm, id_entidad: e.target.value})} style={inputStyle} required>
+                            <option value="">Seleccionar Tercero...</option>
+                            {entities.map(e => <option key={e.id} value={e.id}>{e.razon_social}</option>)}
+                        </select>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                           <input value={docForm.referencia} onChange={e => setDocForm({...docForm, referencia: e.target.value})} placeholder="Nº Factura / Ref" style={inputStyle} required />
+                           <input value={docForm.total} onChange={e => setDocForm({...docForm, total: e.target.value})} placeholder="Total $" style={inputStyle} required />
+                        </div>
+                        <input type="date" value={docForm.fecha_vencimiento} onChange={e => setDocForm({...docForm, fecha_vencimiento: e.target.value})} style={inputStyle} />
+                        <button className="btn" type="submit" disabled={saving || !docForm.total || !docForm.id_entidad}>Registrar Deuda</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+    );
+  };
+
+  const renderConciliacion = () => (
+      <div className="space-y-6" style={{ animation: 'fadeIn 0.5s ease' }}>
+        <header>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--primary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, fontSize: '0.8rem', marginBottom: 8 }}>
+                <CheckCircle2 size={14} /> Auditoría
+            </div>
+            <h2 className="h1" style={{ fontSize: '2.2rem' }}>Conciliación Bancaria</h2>
+            <p className="text-sec">Verifica que los saldos del sistema coincidan con tu estado de cuenta real.</p>
+        </header>
+
+        <section style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 24, alignItems: 'start' }}>
+            {/* Lista Bancos */}
+            <div className="glass-card" style={{ padding: 0 }}>
+                <div style={{ padding: 20, borderBottom: '1px solid var(--border-color)', background: 'var(--primary-light)' }}>
+                    <h3 style={{ margin: 0, color: 'var(--primary)' }}>Saldos Contables</h3>
+                    <div style={{ fontSize: '0.75rem', marginTop: 4, color: 'var(--text-main)' }}>Valores calculados por el sistema</div>
+                </div>
+                <div>
+                   {cuentas.map(c => {
+                       const c_movs = movimientos.filter(m => m.cuenta_financiera?.nombre === c.nombre);
+                       const ingresos = c_movs.filter(m => m.tipo_movimiento === 'Cobro').reduce((a, b) => a + Number(b.monto), 0);
+                       const egresos = c_movs.filter(m => m.tipo_movimiento === 'Pago').reduce((a, b) => a + Number(b.monto), 0);
+                       const saldoFinal = Number(c.saldo_inicial) + ingresos - egresos;
+
+                       return (
+                       <div key={c.id} style={{ padding: 20, borderBottom: '1px solid var(--border-color)' }}>
+                           <div style={{ fontWeight: 800, fontSize: '1.1rem', marginBottom: 12 }}>{c.nombre}</div>
+                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: 6 }}>
+                               <span className="text-sec">Inicial:</span> <span>${Number(c.saldo_inicial).toFixed(2)}</span>
+                           </div>
+                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: 6, color: 'var(--success)' }}>
+                               <span>Ingresos:</span> <span>+${ingresos.toFixed(2)}</span>
+                           </div>
+                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: 12, color: 'var(--error)' }}>
+                               <span>Egresos:</span> <span>-${egresos.toFixed(2)}</span>
+                           </div>
+                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 900, paddingTop: 12, borderTop: '1px dashed var(--border-color)' }}>
+                               <span>Calculado:</span> <span>${saldoFinal.toFixed(2)}</span>
+                           </div>
+                       </div>
+                       );
+                   })}
+                </div>
+            </div>
+
+            {/* Libro Auxiliar de Bancos */}
+            <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
+                <div style={{ padding: 20, borderBottom: '1px solid var(--border-color)' }}>
+                    <h3 style={{ margin: 0 }}>Libro Auxiliar de Bancos</h3>
+                    <p className="text-sec" style={{ margin: '6px 0 0' }}>Historial detallado para cotejar (Cartola).</p>
+                </div>
+                <div style={{ overflowX: 'auto' }}>
+                    <table className="data-table">
+                        <thead><tr><th>Fecha / Ref</th><th>Cuenta</th><th>Concepto / Proveedor</th><th style={{ textAlign: 'right' }}>Cobros</th><th style={{ textAlign: 'right' }}>Pagos</th></tr></thead>
+                        <tbody>
+                            {movimientos.map(mov => (
+                                <tr key={mov.id}>
+                                    <td style={{ padding: '12px 16px' }}>
+                                        <div style={{ fontWeight: 800 }}>{mov.fecha}</div>
+                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-sec)' }}>{mov.referencia || 'S/N'}</div>
+                                    </td>
+                                    <td style={{ padding: '12px 16px', fontWeight: 600 }}>{mov.cuenta_financiera?.nombre}</td>
+                                    <td style={{ padding: '12px 16px' }}>
+                                        <div>{mov.concepto}</div>
+                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-sec)' }}>{mov.entidades?.razon_social}</div>
+                                    </td>
+                                    <td style={{ padding: '12px 16px', textAlign: 'right', fontWeight: 800, color: 'var(--success)' }}>
+                                        {mov.tipo_movimiento === 'Cobro' ? `$${Number(mov.monto).toFixed(2)}` : ''}
+                                    </td>
+                                    <td style={{ padding: '12px 16px', textAlign: 'right', fontWeight: 800, color: 'var(--error)' }}>
+                                        {mov.tipo_movimiento === 'Pago' ? `$${Number(mov.monto).toFixed(2)}` : ''}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+      </div>
+  );
+
+  if (loading) return <div style={{ padding: '120px 0', width: '100%', display: 'flex', justifyContent: 'center' }}><Loader2 className="animate-spin" size={36} style={{ color: 'var(--primary)' }} /></div>;
+
+  return (
+      <div className="tesoreria-module">
+          {message && <div style={{ background: 'var(--primary)', color: '#000', padding: 12, borderRadius: 12, fontWeight: 800, marginBottom: 20, animation: 'fadeIn 0.3s ease' }}>INFO: {message}</div>}
+          
+          {mode === 'resumen' && renderResumen()}
+          {(mode === 'cobros' || mode === 'pagos') && renderCobrosPagos()}
+          {mode === 'conciliacion' && renderConciliacion()}
+      </div>
   );
 };
