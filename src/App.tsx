@@ -12,19 +12,21 @@ import { supabase } from './services/supabase';
 import { MENU_STRUCTURE } from './constants/menu';
 import type { Session } from '@supabase/supabase-js';
 
-// Views
-import { Entidades } from './views/Entidades';
-import { PlanCuentas } from './views/PlanCuentas';
-import { Configuracion } from './views/Configuracion';
-import { Login } from './views/Login';
-import { Asientos } from './views/Asientos';
-import { Reportes } from './views/Reportes';
-import { Perfil } from './views/Perfil';
-import { DashboardView } from './views/Dashboard';
-import { Sidebar } from './components/Sidebar';
-import { SRIAutomation } from './views/SRIAutomation';
-import { LibroDiario } from './views/LibroDiario';
-import { Tesoreria } from './views/Tesoreria';
+import React, { Suspense } from 'react';
+
+// Lazy loading views
+const Entidades = React.lazy(() => import('./views/Entidades').then(m => ({ default: m.Entidades })));
+const PlanCuentas = React.lazy(() => import('./views/PlanCuentas').then(m => ({ default: m.PlanCuentas })));
+const Configuracion = React.lazy(() => import('./views/Configuracion').then(m => ({ default: m.Configuracion })));
+const Login = React.lazy(() => import('./views/Login').then(m => ({ default: m.Login })));
+const Asientos = React.lazy(() => import('./views/Asientos').then(m => ({ default: m.Asientos })));
+const Reportes = React.lazy(() => import('./views/Reportes').then(m => ({ default: m.Reportes })));
+const Perfil = React.lazy(() => import('./views/Perfil').then(m => ({ default: m.Perfil })));
+const DashboardView = React.lazy(() => import('./views/Dashboard').then(m => ({ default: m.DashboardView })));
+const Sidebar = React.lazy(() => import('./components/Sidebar').then(m => ({ default: m.Sidebar })));
+const SRIAutomation = React.lazy(() => import('./views/SRIAutomation').then(m => ({ default: m.SRIAutomation })));
+const LibroDiario = React.lazy(() => import('./views/LibroDiario').then(m => ({ default: m.LibroDiario })));
+const Tesoreria = React.lazy(() => import('./views/Tesoreria').then(m => ({ default: m.Tesoreria })));
 
 interface Empresa {
   id: string;
@@ -185,7 +187,11 @@ const App = () => {
   };
 
   if (!session) {
-    return <Login />;
+    return (
+      <Suspense fallback={<div className="flex-center" style={{ height: '100vh', background: '#0f172a' }}><Loader2 className="animate-spin text-primary" size={48} /></div>}>
+        <Login />
+      </Suspense>
+    );
   }
 
   if (loadingEmpresas) {
@@ -203,20 +209,24 @@ const App = () => {
         <div className="orb orb-2"></div>
       </div>
 
-      <Sidebar 
-        activeView={activeView}
-        setActiveView={setActiveView}
-        selectedEmpresa={selectedEmpresa}
-        setSelectedEmpresa={setSelectedEmpresa}
-        empresas={empresas}
-        setShowNewEmpresaModal={setShowNewEmpresaModal}
-        session={session}
-      />
+      <Suspense fallback={null}>
+        <Sidebar 
+          activeView={activeView}
+          setActiveView={setActiveView}
+          selectedEmpresa={selectedEmpresa}
+          setSelectedEmpresa={setSelectedEmpresa}
+          empresas={empresas}
+          setShowNewEmpresaModal={setShowNewEmpresaModal}
+          session={session}
+        />
+      </Suspense>
 
       <main className="main-content">
         <AnimatePresence mode="wait">
           <div key={activeView}>
-            {renderContent()}
+            <Suspense fallback={<div className="flex-center" style={{ height: '60vh' }}><Loader2 className="animate-spin text-primary" size={32} /></div>}>
+              {renderContent()}
+            </Suspense>
           </div>
         </AnimatePresence>
       </main>

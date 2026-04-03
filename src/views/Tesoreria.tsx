@@ -1,12 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Wallet, Landmark, ArrowDownCircle, ArrowUpCircle, Repeat, Loader2, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../services/supabase';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 interface Props { empresaId: string; mode?: 'resumen' | 'cobros' | 'pagos' | 'conciliacion'; }
-interface CuentaFinanciera { id: string; nombre: string; tipo: string; saldo_inicial: number | null; moneda: string | null; numero_referencia: string | null; }
-interface DocumentoTesoreria { id: string; fecha_emision: string; fecha_vencimiento: string | null; tipo_documento: string; referencia: string | null; concepto: string; saldo_pendiente: number; total: number; estado: string; entidades?: { id?: string; razon_social: string } | null; }
-interface MovimientoTesoreria { id: string; fecha: string; tipo_movimiento: string; concepto: string; monto: number; estado: string; referencia: string | null; cuenta_financiera?: { nombre: string } | null; entidades?: { id?: string; razon_social: string } | null; documento?: { referencia: string | null; concepto: string } | null; }
-interface Entity { id: string; razon_social: string; tipo_entidad: string; }
 
 const inputStyle: React.CSSProperties = {
   width: '100%', padding: '12px 14px', borderRadius: 12, border: '1px solid var(--border-color)', background: 'var(--input-bg)', color: 'var(--text-main)', outline: 'none'
@@ -15,12 +12,8 @@ const inputStyle: React.CSSProperties = {
 const cardTitle: React.CSSProperties = { fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: 1.2, color: 'var(--text-sec)', fontWeight: 800 };
 
 export const Tesoreria: React.FC<Props> = ({ empresaId, mode = 'resumen' }) => {
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [saving, setSaving] = useState(false);
-  const [cuentas, setCuentas] = useState<CuentaFinanciera[]>([]);
-  const [documentos, setDocumentos] = useState<DocumentoTesoreria[]>([]);
-  const [movimientos, setMovimientos] = useState<MovimientoTesoreria[]>([]);
-  const [entities, setEntities] = useState<Entity[]>([]);
   const [message, setMessage] = useState('');
   const [showCuentaForm, setShowCuentaForm] = useState(false);
 
@@ -35,10 +28,9 @@ export const Tesoreria: React.FC<Props> = ({ empresaId, mode = 'resumen' }) => {
     fecha_emision: new Date().toISOString().slice(0, 10), fecha_vencimiento: '', id_entidad: '', concepto: '', referencia: '', total: ''
   });
 
-  const loadData = async () => {
-    setLoading(true);
-    setMessage('');
-    try {
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ['tesoreria', empresaId],
+    queryFn: async () => {
       const [cuentasRes, docsRes, movRes, entRes] = await Promise.all([
         supabase.from('cuentas_financieras').select('*').eq('id_empresa', empresaId).order('nombre'),
         supabase.from('tesoreria_documentos').select('id,fecha_emision,fecha_vencimiento,tipo_documento,referencia,concepto,saldo_pendiente,total,estado,entidades(id,razon_social)').eq('id_empresa', empresaId).order('fecha_emision', { ascending: false }),
@@ -46,29 +38,27 @@ export const Tesoreria: React.FC<Props> = ({ empresaId, mode = 'resumen' }) => {
         supabase.from('entidades').select('id,razon_social,tipo_entidad').eq('id_empresa', empresaId).order('razon_social')
       ]);
 
-      if (!cuentasRes.error) setCuentas(cuentasRes.data || []);
-      if (!docsRes.error) {
-        const normalized = (docsRes.data || []).map((item: any) => ({ ...item, entidades: Array.isArray(item.entidades) ? item.entidades[0] : item.entidades }));
-        setDocumentos(normalized);
-      }
-      if (!movRes.error) {
-        const normalized = (movRes.data || []).map((item: any) => ({
+      return {
+        cuentas: cuentasRes.data || [],
+        documentos: (docsRes.data || []).map((item: any) => ({ ...item, entidades: Array.isArray(item.entidades) ? item.entidades[0] : item.entidades })),
+        movimientos: (movRes.data || []).map((item: any) => ({
           ...item,
           cuenta_financiera: Array.isArray(item.cuenta_financiera) ? item.cuenta_financiera[0] : item.cuenta_financiera,
           entidades: Array.isArray(item.entidades) ? item.entidades[0] : item.entidades,
           documento: Array.isArray(item.documento) ? item.documento[0] : item.documento,
-        }));
-        setMovimientos(normalized);
-      }
-      if (!entRes.error) setEntities(entRes.data || []);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+        })),
+        entities: entRes.data || []
+      };
+    },
+    staleTime: 1000 * 60 * 5, // Cache for 5 mins
+  });
 
-  useEffect(() => { loadData(); }, [empresaId]);
+  const cuentas = data?.cuentas || [];
+  const documentos = data?.documentos || [];
+  const movimientos = data?.movimientos || [];
+  const entities = data?.entities || [];
+
+
 
   const summary = useMemo(() => {
     const disponible = cuentas.reduce((acc, c) => acc + Number(c.saldo_inicial || 0), 0);
@@ -103,7 +93,7 @@ export const Tesoreria: React.FC<Props> = ({ empresaId, mode = 'resumen' }) => {
       setCuentaForm({ nombre: '', tipo: 'Banco', saldo_inicial: '0', moneda: 'USD', numero_referencia: '' });
       setShowCuentaForm(false);
       setMessage('Cuenta financiera registrada.');
-      await loadData();
+      await queryClient.invalidateQueries({ queryKey: ['tesoreria', empresaId] });
     } catch (error: any) {
       setMessage(error.message || 'No se pudo crear la cuenta financiera.');
     } finally { setSaving(false); }
@@ -131,7 +121,7 @@ export const Tesoreria: React.FC<Props> = ({ empresaId, mode = 'resumen' }) => {
       if (error) throw error;
       setDocForm({ tipo_documento: mode === 'pagos' ? 'Cuenta por pagar' : 'Cuenta por cobrar', fecha_emision: new Date().toISOString().slice(0, 10), fecha_vencimiento: '', id_entidad: '', concepto: '', referencia: '', total: '' });
       setMessage('Documento de tesorería registrado.');
-      await loadData();
+      await queryClient.invalidateQueries({ queryKey: ['tesoreria', empresaId] });
     } catch (error: any) {
       setMessage(error.message || 'No se pudo crear el documento.');
     } finally { setSaving(false); }
@@ -169,7 +159,7 @@ export const Tesoreria: React.FC<Props> = ({ empresaId, mode = 'resumen' }) => {
 
       setMovForm({ fecha: new Date().toISOString().slice(0, 10), tipo_movimiento: mode === 'pagos' ? 'Pago' : 'Cobro', concepto: '', monto: '', id_cuenta_financiera: '', id_entidad: '', id_documento: '', referencia: '', estado: 'Aplicado' });
       setMessage('Movimiento de tesorería registrado.');
-      await loadData();
+      await queryClient.invalidateQueries({ queryKey: ['tesoreria', empresaId] });
     } catch (error: any) {
       setMessage(error.message || 'No se pudo registrar el movimiento.');
     } finally { setSaving(false); }

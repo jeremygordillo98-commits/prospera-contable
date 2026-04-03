@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import type { CSSProperties } from 'react';
 import { supabase } from '../services/supabase';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { 
   Search, 
   Plus, 
@@ -13,9 +14,8 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export const Entidades = ({ empresaId }: { empresaId: string }) => {
-  const [entidades, setEntidades] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+export const Entidades: React.FC<{ empresaId: string }> = ({ empresaId }) => {
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   
   // Modal state
@@ -33,22 +33,21 @@ export const Entidades = ({ empresaId }: { empresaId: string }) => {
   });
   const [saving, setSaving] = useState(false);
 
-  const fetchEntidades = async () => {
-    if (!empresaId) return;
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('entidades')
-      .select('*')
-      .eq('id_empresa', empresaId)
-      .order('razon_social', { ascending: true });
-    
-    if (!error && data) setEntidades(data);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchEntidades();
-  }, [empresaId]);
+  const { data: entidades = [], isLoading: loading } = useQuery({
+    queryKey: ['entidades', empresaId],
+    queryFn: async () => {
+      if (!empresaId) return [];
+      const { data, error } = await supabase
+        .from('entidades')
+        .select('*')
+        .eq('id_empresa', empresaId)
+        .order('razon_social', { ascending: true });
+      
+      if (error) throw error;
+      return data || [];
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes cache
+  });
 
   const filtered = entidades.filter(e => 
     e.razon_social.toLowerCase().includes(search.toLowerCase()) || 
@@ -97,7 +96,7 @@ export const Entidades = ({ empresaId }: { empresaId: string }) => {
         const { error } = await supabase.from('entidades').insert([dataToSave]);
         if (error) throw error;
       }
-      await fetchEntidades();
+      await queryClient.invalidateQueries({ queryKey: ['entidades', empresaId] });
       handleCloseModal();
     } catch (error) {
       console.error("Error saving entity:", error);
@@ -114,7 +113,7 @@ export const Entidades = ({ empresaId }: { empresaId: string }) => {
         console.error("Error deleting:", error);
         alert("Error al eliminar. Podría estar en uso.");
       } else {
-        fetchEntidades();
+        await queryClient.invalidateQueries({ queryKey: ['entidades', empresaId] });
       }
     }
   };
