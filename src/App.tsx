@@ -98,32 +98,41 @@ const App = () => {
   };
 
   const createEmpresa = async () => {
-    if (!newEmpresaName || !session?.user?.id) return;
+    try {
+        if (!newEmpresaName || !session?.user?.id) return;
 
-    if (empresas.length >= limiteEmpresas) {
-        setShowNewEmpresaModal(false);
-        setShowLimitModal(true);
-        return;
-    }
+        if (empresas.length >= limiteEmpresas) {
+            setShowNewEmpresaModal(false);
+            setShowLimitModal(true);
+            return;
+        }
 
-    const { data, error } = await supabase
-      .from('empresas_gestionadas')
-      .insert({ 
-        nombre_empresa: newEmpresaName,
-        ruc_empresa: `TEMP-${Date.now()}`,
-        id_usuario: session.user.id,
-        moneda: 'USD'
-      })
-      .select()
-      .single();
-    
-    if (!error && data) {
-      setEmpresas([...empresas, data]);
-      setSelectedEmpresa(data);
-      setShowNewEmpresaModal(false);
-      setNewEmpresaName('');
-    } else {
-      console.error("Supabase Error:", error);
+        const newId = crypto.randomUUID();
+
+        const { data, error } = await supabase
+          .from('empresas_gestionadas')
+          .insert({ 
+            id: newId,
+            nombre_empresa: newEmpresaName,
+            ruc_empresa: `TEMP-${Date.now()}`,
+            id_usuario: session.user.id,
+            moneda: 'USD'
+          })
+          .select()
+          .single();
+        
+        if (!error && data) {
+          setEmpresas([...empresas, data]);
+          setSelectedEmpresa(data);
+          setShowNewEmpresaModal(false);
+          setNewEmpresaName('');
+        } else {
+          console.error("Supabase Error:", error);
+          alert(`Error al crear empresa: ${error?.message || 'Revisa tu conexión o las políticas de la base de datos'}`);
+        }
+    } catch (err: any) {
+        console.error("Client Error:", err);
+        alert(`Error inesperado: ${err?.message || 'No se pudo procesar la solicitud'}`);
     }
   };
 
